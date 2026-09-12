@@ -66,14 +66,16 @@
             </div>
 
             <!-- the user menu block -->
-            <div class="d-flex align-items-center py-3 py-lg-0">
-                <div class="d-flex align-items-center ms-1" data-kt-menu-trigger="click"
-                    data-kt-menu-placement="bottom-end">
-                    <div class="symbol symbol-50px me-5">
-                        <img alt="Avatar"
-                            src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('assets/media/avatars/blank.png') }}" />
+            @auth
+                <div class="d-flex align-items-center py-3 py-lg-0">
+                    <div class="d-flex align-items-center ms-1" data-kt-menu-trigger="click"
+                        data-kt-menu-placement="bottom-end">
+                        <div class="symbol symbol-50px me-5">
+                            <img alt="Avatar"
+                                src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('assets/media/avatars/blank.png') }}" />
+                        </div>
                     </div>
-                </div>
+            @endauth
 
                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold py-4 fs-6 w-275px"
                     data-kt-menu="true">

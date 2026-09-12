@@ -91,8 +91,8 @@
                 </div>
 
                 <div class="menu-item">
-                    <a class="menu-link {{ request()->routeIs('orders.index', 'orders.show') ? 'active' : '' }}"
-                        href="{{ route('orders.index') }}">
+                    <a class="menu-link {{ request()->routeIs('orders.*') && (request()->boolean('my_orders') || !auth()->user()?->isAdmin()) ? 'active' : '' }}"
+                        href="{{ route('orders.index', auth()->user()?->isAdmin() ? ['my_orders' => 1] : []) }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                         <span class="menu-title">My Orders</span>
                     </a>
@@ -115,7 +115,8 @@
                     </div>
 
                     <div class="menu-item">
-                        <a class="menu-link" href="{{ route('orders.index') }}">
+                        <a class="menu-link {{ request()->routeIs('orders.*') && !request()->boolean('my_orders') ? 'active' : '' }}"
+                            href="{{ route('orders.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">View All Orders</span>
                         </a>

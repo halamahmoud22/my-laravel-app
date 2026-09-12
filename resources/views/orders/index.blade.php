@@ -1,6 +1,6 @@
 @extends('layouts.metronic')
 
-@section('page-title', 'Orders')
+@section('page-title', request()->boolean('my_orders') ? 'My Orders' : 'Orders')
 
 @section('content')
 <div class="d-flex flex-column gap-5">
@@ -22,9 +22,12 @@
         </div>
         <div class="card-body pt-2">
             <form method="GET" action="{{ route('orders.index') }}">
+                @if(request()->boolean('my_orders'))
+                    <input type="hidden" name="my_orders" value="1">
+                @endif
                 <div class="row g-4 align-items-end">
-                    {{-- Customer Filter (Admin only) --}}
-                    @can('admin')
+                    {{-- Customer Filter (Admin only, when viewing all orders) --}}
+                    @if(auth()->user()?->isAdmin() && !request()->boolean('my_orders'))
                         <div class="col-12 col-sm-6 col-lg-3">
                             <label class="form-label fw-bold fs-7 text-gray-700">Customer Name / ID</label>
                             <div class="position-relative">
@@ -35,7 +38,7 @@
                                        value="{{ request('customer') }}">
                             </div>
                         </div>
-                    @endcan
+                    @endif
 
                     {{-- Product Filter --}}
                     <div class="col-12 col-sm-6 col-lg-3">
@@ -83,7 +86,7 @@
 
                     {{-- Action Buttons --}}
                     <div class="col-12 d-flex gap-2 justify-content-end mt-4">
-                        <a href="{{ route('orders.index') }}" class="btn btn-light btn-active-light-primary">
+                        <a href="{{ route('orders.index', request()->boolean('my_orders') ? ['my_orders' => 1] : []) }}" class="btn btn-light btn-active-light-primary">
                             Reset
                         </a>
                         <button type="submit" class="btn btn-primary">
@@ -103,7 +106,7 @@
     <div class="card card-flush">
         <div class="card-header pt-6">
             <h3 class="card-title fw-bolder text-gray-900">
-                Orders List
+                {{ request()->boolean('my_orders') ? 'My Orders' : 'Orders List' }}
                 <span class="fs-6 text-gray-400 fw-normal ms-2">({{ $orders->total() }} total)</span>
             </h3>
         </div>
@@ -119,7 +122,7 @@
                     <h4 class="text-gray-800 fw-bold">No orders found</h4>
                     <p class="text-muted fs-7">Try adjusting your filters or search criteria.</p>
                     @if(request()->hasAny(['customer', 'product_id', 'status', 'date_from', 'date_to', 'order_id']))
-                        <a href="{{ route('orders.index') }}" class="btn btn-sm btn-light-primary mt-2">
+                        <a href="{{ route('orders.index', request()->boolean('my_orders') ? ['my_orders' => 1] : []) }}" class="btn btn-sm btn-light-primary mt-2">
                             Clear Filters
                         </a>
                     @endif
@@ -130,9 +133,9 @@
                         <thead>
                             <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                                 <th>Order #</th>
-                                @can('admin')
+                                @if(auth()->user()?->isAdmin() && !request()->boolean('my_orders'))
                                     <th>Customer</th>
-                                @endcan
+                                @endif
                                 <th>Products</th>
                                 <th>Total</th>
                                 <th>Status</th>
@@ -144,18 +147,18 @@
                             @foreach($orders as $order)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('orders.show', $order) }}" class="text-gray-800 text-hover-primary fw-bold">
+                                        <a href="{{ route('orders.show', [$order] + (request()->boolean('my_orders') ? ['my_orders' => 1] : [])) }}" class="text-gray-800 text-hover-primary fw-bold">
                                             #{{ $order->id }}
                                         </a>
                                     </td>
-                                    @can('admin')
+                                    @if(auth()->user()?->isAdmin() && !request()->boolean('my_orders'))
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span class="text-gray-800 fw-bold">{{ $order->user->name ?? 'Guest/Unknown' }}</span>
                                                 <span class="text-muted fs-8">{{ $order->user->email ?? '' }}</span>
                                             </div>
                                         </td>
-                                    @endcan
+                                    @endif
                                     <td>
                                         <div class="d-flex flex-column gap-1">
                                             @foreach($order->items as $item)
@@ -185,7 +188,7 @@
                                         <span class="text-gray-700 fs-7">{{ $order->created_at->format('M d, Y - h:i A') }}</span>
                                     </td>
                                     <td class="text-end">
-                                        <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-light-primary">
+                                        <a href="{{ route('orders.show', [$order] + (request()->boolean('my_orders') ? ['my_orders' => 1] : [])) }}" class="btn btn-sm btn-light-primary">
                                             View
                                         </a>
                                     </td>

@@ -19,7 +19,9 @@
             } }} fs-6">
                 {{ ucfirst($order->status) }}
             </span>
-            <a href="{{ route('orders.index') }}" class="btn btn-sm btn-light">View All Orders</a>
+            <a href="{{ route('orders.index', request()->boolean('my_orders') ? ['my_orders' => 1] : []) }}" class="btn btn-sm btn-light">
+                {{ request()->boolean('my_orders') ? 'Back to My Orders' : (auth()->user()?->isAdmin() ? 'View All Orders' : 'Back to Orders') }}
+            </a>
         </div>
     </div>
 </div>

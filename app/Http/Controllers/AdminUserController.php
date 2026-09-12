@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -41,9 +42,13 @@ class AdminUserController extends Controller implements HasMiddleware
             'role' => 'required|in:admin,super_admin',
         ]);
 
-        $validated['password'] = bcrypt($validated['password']);
-
-        User::create($validated);
+        $admin = new User([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+        $admin->role = $validated['role']; // explicit assignment bypasses $fillable on purpose
+        $admin->save();
 
         return redirect()->route('admin.users.index')
             ->with('success', 'Admin user created successfully.');
@@ -88,7 +93,9 @@ class AdminUserController extends Controller implements HasMiddleware
             'role' => 'required|in:admin,super_admin',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
-
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->role = $validated['role']; // explicit, same reason as store()
         if (empty($validated['password'])) {
             unset($validated['password']);
         } else {
@@ -110,10 +117,9 @@ class AdminUserController extends Controller implements HasMiddleware
             abort(403, 'User is not an admin.');
         }
 
-        // Prevent deleting the last super_admin
-        if ($user->role === 'super_admin' && User::where('role', 'super_admin')->count() <= 1) {
+        if ($user->role === 'super_admin') {
             return redirect()->route('admin.users.index')
-                ->with('error', 'Cannot delete the last super admin.');
+                ->with('error', 'Super admins cannot be deleted.');
         }
 
         $user->delete();

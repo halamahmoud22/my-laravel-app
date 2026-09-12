@@ -24,33 +24,26 @@ class OrderController extends Controller
         $user = auth()->user();
         $isAdmin = $user && in_array($user->role, ['admin', 'super_admin']);
 
-        if (! $isAdmin) {
-            $query->where('user_id', auth()->id()); // customers: scoped to their own
+        if (! $isAdmin || $request->boolean('my_orders')) {
+            $query->where('user_id', auth()->id()); // customers or admin viewing personal orders: scoped to their own
         }
-        // admins: no scope added, see everything
-
+        // admins viewing all orders: no scope added, see everything
         // --- Filters ---
-
         if ($request->filled('order_id')) {
             $query->where('id', $request->order_id);
         }
-
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
-
-        if ($isAdmin && $request->filled('customer')) {
+        if ($isAdmin && ! $request->boolean('my_orders') && $request->filled('customer')) {
             $customer = $request->customer;
-
             $query->whereHas('user', function ($q) use ($customer) {
                 $q->where('name', 'like', "%{$customer}%");
-
                 if (is_numeric($customer)) {
                     $q->orWhere('id', $customer);
                 }
             });
         }
-
         // Filter by Product (by ID or Name)
         if ($request->filled('product_id')) {
             $query->whereHas('items', function ($q) use ($request) {
@@ -62,20 +55,16 @@ class OrderController extends Controller
                 $q->where('name', 'like', "%{$productName}%");
             });
         }
-
         // Filter by Date or Date Range
         if ($request->filled('date')) {
             $query->whereDate('created_at', $request->date);
         }
-
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
-
         if ($request->filled('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
-
         $orders = $query->with(['user', 'items.product'])->paginate(10)->withQueryString();
         $products = Product::orderBy('name')->get(['id', 'name']);
 
