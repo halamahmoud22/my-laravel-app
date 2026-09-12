@@ -60,9 +60,11 @@ class ProductController extends Controller
         $this->authorize('create', Product::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|string|max:255',
         ]);
         Product::create($validated);
         return redirect()->route('products.index');
@@ -97,9 +99,11 @@ class ProductController extends Controller
         $this->authorize('update', $product);
         $validated = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|string|max:255',
         ]);
         $product->update($validated);
         return redirect()->route('products.show', $product->id);

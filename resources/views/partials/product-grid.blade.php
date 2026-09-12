@@ -13,7 +13,7 @@
         <div class="col-sm-6 col-xl-4 col-xxl-3">
             <div class="card card-flush h-100">
                 <a href="{{ route('products.show', $product) }}" class="d-block bg-light rounded-top overflow-hidden">
-                    <img src="{{ asset('assets/media/products/' . $product->id . '.png') }}" alt="{{ $product->name }}"
+                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
                         class="w-100 object-fit-cover" style="height: 220px;"
                         onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
                 </a>
@@ -28,9 +28,9 @@
                             <form method="POST" action="{{ route('cart.add', $product) }}">
                                 @csrf
                                 <button type="submit" class="btn btn-icon btn-light-primary" title="Add to cart"
-                                    aria-label="Add {{ $product->name }} to cart"><i
-                                        class="ki-duotone ki-basket fs-2"><span class="path1"></span><span
-                                            class="path2"></span></i></button>
+                                    aria-label="Add {{ $product->name }} to cart">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
                             </form>
                         @else
                             <a href="{{ route('login') }}" class="btn btn-icon btn-light-primary"

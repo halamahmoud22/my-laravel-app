@@ -59,7 +59,18 @@
                                 </select>
                             </div>
 
+                            <div class="fv-row mb-10">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Enter product description">{{ old('description') }}</textarea>
+                            </div>
+
+                            <div class="fv-row mb-10">
+                                <label class="form-label">Product Image (e.g. 1.png - 22.png or custom filename)</label>
+                                <input type="text" name="image" value="{{ old('image') }}" class="form-control" placeholder="1.png">
+                            </div>
+
                             <div class="d-flex justify-content-end">
+                                <a href="{{ route('products.index') }}" class="btn btn-light me-3">Cancel</a>
                                 <button type="submit" class="btn btn-primary">Create Product</button>
                             </div>
                         </form>

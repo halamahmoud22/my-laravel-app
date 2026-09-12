@@ -46,14 +46,17 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
+                                                    <div class="symbol symbol-50px me-4">
+                                                        <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="object-fit-cover rounded" style="width: 50px; height: 50px;" onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
+                                                    </div>
                                                     <div class="d-flex flex-column">
-                                                        <a href="{{ route('products.show', $product->id) }}" class="text-gray-900 text-hover-primary fw-bold">{{ $product->name }}</a>
+                                                        <a href="{{ route('products.show', $product->id) }}" class="text-gray-900 text-hover-primary fw-bold fs-6">{{ $product->name }}</a>
+                                                        <span class="text-muted fw-semibold fs-7">{{ $product->category->name ?? 'General' }}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>${{ number_format($product->price, 2) }}</td>
                                             <td class="text-end">
-                                                <td class="text-end">
                                                 @can('update', $product)
                                                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-light-primary btn-sm me-2">
                                                         <i class="ki-duotone ki-pencil fs-5 me-2">

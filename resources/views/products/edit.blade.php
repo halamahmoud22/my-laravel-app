@@ -61,6 +61,19 @@
                                 </select>
                             </div>
 
+                            <div class="fv-row mb-10">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Enter product description">{{ old('description', $product->description) }}</textarea>
+                            </div>
+
+                            <div class="fv-row mb-10">
+                                <label class="form-label">Product Image (e.g. 1.png - 22.png or custom filename)</label>
+                                <div class="d-flex align-items-center gap-4">
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
+                                    <input type="text" name="image" value="{{ old('image', $product->image) }}" class="form-control" placeholder="1.png">
+                                </div>
+                            </div>
+
                             <div class="d-flex justify-content-end">
                                 <a href="{{ route('products.index') }}" class="btn btn-light me-3">Cancel</a>
                                 <button type="submit" class="btn btn-primary">Update Product</button>

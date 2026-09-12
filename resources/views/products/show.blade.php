@@ -65,8 +65,17 @@
                             </div>
                         </div>
 
-                        <!-- Actions Card -->
+                        <!-- Actions & Image Column -->
                         <div class="col-lg-4">
+                            <!-- Product Image Card -->
+                            <div class="card card-flush mb-6">
+                                <div class="card-body text-center p-6 bg-light rounded">
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                        class="img-fluid rounded" style="max-height: 280px; object-fit: contain;"
+                                        onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
+                                </div>
+                            </div>
+
                             <div class="card card-flush">
                                 <div class="card-header border-0 pt-6">
                                     <h3 class="card-title">
