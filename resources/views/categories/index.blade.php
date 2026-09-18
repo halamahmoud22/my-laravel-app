@@ -8,7 +8,7 @@
                 <div class="app-container container-xxl d-flex align-items-center">
                     <div class="d-flex align-items-center flex-grow-1">
                         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                            Categories
+                            {{ __('store.categories') }}
                         </h1>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                                             stroke-width="2" stroke-linecap="round" />
                                     </svg>
                                 </span>
-                                Add Category
+                                {{ __('store.add_category') }}
                             </a>
                         </div>
                     @endcan
@@ -68,7 +68,7 @@
                                         </span>
                                         <input type="text" name="search" value="{{ $search ?? '' }}"
                                             class="form-control form-control-solid w-250px ps-15"
-                                            placeholder="Search category..." />
+                                            placeholder="{{ __('store.search') }} {{ __('store.categories') }}..." />
                                     </form>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@
                             <table class="table table-row-dashed table-row-gray-300 gy-7" id="kt_table_categories">
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
-                                        <th>Category Name</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -97,7 +97,7 @@
                                                             <span class="path1"></span>
                                                             <span class="path2"></span>
                                                         </i>
-                                                        Edit
+                                                        {{ __('user.edit') }}
                                                     </a>
                                                     <form action="{{ route('admin.categories.destroy', $category->id) }}"
                                                         method="POST" style="display:inline;">
@@ -109,7 +109,7 @@
                                                                 <span class="path1"></span>
                                                                 <span class="path2"></span>
                                                             </i>
-                                                            Delete
+                                                            {{ __('user.delete') }}
                                                         </button>
                                                     </form>
                                                 @endcan
@@ -118,7 +118,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="2" class="text-center text-gray-500 py-10">
-                                                No categories found
+                                                {{ __('store.no_categories') }}
                                             </td>
                                         </tr>
                                     @endforelse

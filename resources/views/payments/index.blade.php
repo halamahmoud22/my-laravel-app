@@ -1,24 +1,23 @@
 @extends('layouts.metronic')
 
-@section('title', 'Payments')
+@section('title', __('store.payments'))
 
 @section('content')
 <div class="card card-flush">
     <div class="card-header py-5 border-0">
-        <h3 class="card-title fw-bolder text-gray-900">Payment History</h3>
+        <h3 class="card-title fw-bolder text-gray-900">{{ __('store.payments') }}</h3>
     </div>
 
     @if ($payments->count())
         <table class="table table-striped table-row-bordered gy-5 gs-7">
             <thead>
                 <tr class="fw-bold fs-6 text-muted border-bottom-2 border-gray-200">
-                    <th>Transaction ID</th>
-                    <th>Order</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Method</th>
-                    <th>Date</th>
-                    <th class="text-end">Action</th>
+                    <th>{{ __('store.transaction_id') }}</th>
+                    <th>{{ __('store.order') }}</th>
+                    <th>{{ __('store.amount') }}</th>
+                    <th>{{ __('store.status') }}</th>
+                    <th>{{ __('store.method') }}</th>
+                    <th>{{ __('store.date') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,15 +36,15 @@
                         </td>
                         <td>
                             @if ($payment->status === 'completed')
-                                <span class="badge badge-success">Completed</span>
+                                <span class="badge badge-success">{{ __('store.completed') }}</span>
                             @elseif ($payment->status === 'pending')
-                                <span class="badge badge-warning">Pending</span>
+                                <span class="badge badge-warning">{{ __('store.pending') }}</span>
                             @else
-                                <span class="badge badge-danger">Failed</span>
+                                <span class="badge badge-danger">{{ __('store.failed') }}</span>
                             @endif
                         </td>
                         <td>
-                            <span class="text-muted fw-semibold">{{ ucfirst($payment->payment_method ?? 'N/A') }}</span>
+                            <span class="text-muted fw-semibold">{{ $payment->payment_method ? ucfirst($payment->payment_method) : __('store.not_available') }}</span>
                         </td>
                         <td>
                             <span class="text-muted fw-semibold">{{ $payment->created_at->format('M d, Y') }}</span>
@@ -66,8 +65,8 @@
     @else
         <div class="card-body text-center py-15">
             <i class="ki-duotone ki-credit-cart fs-5x text-muted mb-5"><span class="path1"></span><span class="path2"></span></i>
-            <h3 class="text-gray-900 fw-bolder">No payments yet</h3>
-            <p class="text-muted mb-0">Payments will appear here once orders are placed and paid.</p>
+            <h3 class="text-gray-900 fw-bolder">{{ __('store.no_payments_yet') }}</h3>
+            <p class="text-muted mb-0">{{ __('store.no_payments_sup') }}</p>
         </div>
     @endif
 </div>

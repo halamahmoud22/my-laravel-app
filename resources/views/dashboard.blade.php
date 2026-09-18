@@ -8,7 +8,7 @@
         <div class="card bg-primary hoverable card-xl-stretch mb-xl-8">
             <div class="card-body">
                 <div class="text-white fw-bolder fs-2 mb-2 mt-5">{{ $productCount }}</div>
-                <div class="fw-bold text-white">Total Products</div>
+                <div class="fw-bold text-white">{{ __('store.total_products') }}</div>
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@
         <div class="card bg-dark hoverable card-xl-stretch mb-xl-8">
             <div class="card-body">
                 <div class="text-gray-100 fw-bolder fs-2 mb-2 mt-5">{{ $categoryCount }}</div>
-                <div class="fw-bold text-gray-100">Total Categories</div>
+                <div class="fw-bold text-gray-100">{{ __('store.total_categories') }}</div>
             </div>
         </div>
     </div>
@@ -26,7 +26,7 @@
         <div class="card bg-body-white hoverable card-xl-stretch mb-xl-8">
             <div class="card-body">
                 <div class="text-gray-900 fw-bolder fs-2 mb-2 mt-5">{{ $orderCount }}</div>
-                <div class="fw-bold text-gray-400">Total Orders</div>
+                <div class="fw-bold text-gray-400">{{ __('store.total_orders') }}</div>
             </div>
         </div>
     </div>
@@ -37,7 +37,7 @@
         <div class="card card-xl-stretch mb-xl-8">
             <div class="card-header border-0 pt-5">
                 <h3 class="card-title align-items-start flex-column">
-                    <span class="card-label fw-bolder text-dark">Recent Orders</span>
+                    <span class="card-label fw-bolder text-dark">{{ __('store.recent_orders') }}</span>
                 </h3>
             </div>
             <div class="card-body py-3">
@@ -45,21 +45,21 @@
                     <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-4">
                         <thead>
                             <tr class="fw-bolder text-muted">
-                                <th>Order #</th>
-                                <th>Customer</th>
-                                <th>Date</th>
+                                <th>{{ __('store.order_number') }}</th>
+                                <th>{{ __('store.customer') }}</th>
+                                <th>{{ __('store.date') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($recentOrders as $order)
                                 <tr>
                                     <td class="text-dark fw-bolder">#{{ $order->id }}</td>
-                                    <td>{{ $order->user->name ?? 'Guest' }}</td>
-                                    <td class="text-muted">{{ $order->created_at->format('M d, Y') }}</td>
+                                    <td>{{ $order->user->name ?? __('store.guest') }}</td>
+                                    <td class="text-muted">{{ __('user.created', ['date' => $order->created_at->translatedFormat('M , d, Y')]) }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">No orders yet</td>
+                                    <td colspan="3" class="text-center text-muted">{{ __('store.no_orders_yet') }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

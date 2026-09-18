@@ -1,6 +1,6 @@
 @extends('layouts.metronic')
 
-@section('page-title', 'Cart')
+@section('page-title', __('store.cart'))
 
 @section('content')
     <div class="card">
@@ -8,17 +8,17 @@
 
             @if ($cartItems->isEmpty())
                 <div class="text-center text-muted py-10">
-                    Your cart is empty.
-                    <a href="{{ route('products.index') }}" class="d-block mt-3">Browse products</a>
+                    {{ __('store.cart_empty') }}
+                    <a href="{{ route('products.index') }}" class="d-block mt-3">{{ __('store.browse_products') }}</a>
                 </div>
             @else
                 <table class="table align-middle">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
+                            <th>{{ __('store.product') }}</th>
+                            <th>{{ __('store.price') }}</th>
+                            <th>{{ __('store.quantity') }}</th>
+                            <th>{{ __('store.subtotal') }}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -51,12 +51,12 @@
                 </table>
 
                 <div class="d-flex justify-content-between align-items-center mt-5">
-                    <h4 class="mb-0">Total: ${{ number_format($total, 2) }}</h4>
+                    <h4 class="mb-0">{{ __('store.total') }}: ${{ number_format($total, 2) }}</h4>
                     <div class="d-flex gap-3">
-                        <a href="{{ route('home') }}" class="btn btn-light">Continue Shopping</a>
+                        <a href="{{ route('home') }}" class="btn btn-light">{{ __('store.continue_shopping') }}</a>
                         <form action="{{ route('checkout.store') }}" method="POST">
                             @csrf
-                            <button type="submit" class="btn btn-primary">Checkout</button>
+                            <button type="submit" class="btn btn-primary">{{ __('store.checkout') }}</button>
                         </form>
                     </div>
                 </div>

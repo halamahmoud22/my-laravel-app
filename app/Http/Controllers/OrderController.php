@@ -6,6 +6,7 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
+use App\Models\ActivityLog;
 
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -112,6 +113,22 @@ class OrderController extends Controller
         }
 
         Cart::where('user_id', auth()->id())->delete();
+
+        foreach ($cartItems as $item) {
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->product->price,
+            ]);
+        }
+        Cart::where('user_id', auth()->id())->delete();
+
+        ActivityLog::create([
+            'user_id' => auth()->id(),
+            'action' => 'order_placed',
+            'description' => "Order #{$order->id} placed",
+        ]);
 
         return redirect()->route('orders.show', $order->id);
     }

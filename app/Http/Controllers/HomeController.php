@@ -17,4 +17,18 @@ class HomeController extends Controller
 
         return view('welcome', compact('products'));
     }
+
+    public function toggleTheme(Request $request)
+    {
+        $currentTheme = $request->cookie('theme', 'light');
+        $newTheme = $currentTheme === 'dark' ? 'light' : 'dark';
+
+        // Update the user's theme preference if logged in
+        if (auth()->check()) {
+            auth()->user()->update(['theme' => $newTheme]);
+        }
+
+        // Set the theme cookie for guests
+        return redirect()->back()->cookie('theme', $newTheme, 60 * 24 * 365);
+    }
 }

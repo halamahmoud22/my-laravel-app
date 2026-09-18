@@ -7,7 +7,7 @@
             <div class="app-container container-xxl d-flex align-items-center">
                 <div class="d-flex align-items-center flex-grow-1">
                     <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                        Create Category
+                        {{ __('user.create') }} {{ __('store.category') }}
                     </h1>
                 </div>
             </div>
@@ -33,13 +33,13 @@
                             @csrf
 
                             <div class="fv-row mb-10">
-                                <label class="required form-label">Name</label>
-                                <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="Enter category name">
+                                <label class="required form-label">{{ __('user.name') }}</label>
+                                <input type="text" name="name" value="{{ old('name') }}" class="form-control" placeholder="{{ __('store.enter_category_name') }}">
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('categories.index') }}" class="btn btn-light me-3">Cancel</a>
-                                <button type="submit" class="btn btn-primary">Create Category</button>
+                                <a href="{{ route('categories.index') }}" class="btn btn-light me-3">{{ __('user.cancel') }}</a>
+                                <button type="submit" class="btn btn-primary">{{ __('user.create') }} {{ __('store.category') }}</button>
                             </div>
                         </form>
 
