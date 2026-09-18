@@ -17,7 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,10 +58,26 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,//innoDB
+            'engine' => null, //innoDB
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+        ],
+
+        'logs' => [
+            'driver' => 'mysql',
+            'host' => env('DB_LOGS_HOST', '127.0.0.1'),
+            'port' => env('DB_LOGS_PORT', '3306'),
+            'database' => env('DB_LOGS_DATABASE', 'ecommerc_logs'),
+            'username' => env('DB_LOGS_USERNAME', 'root'),
+            'password' => env('DB_LOGS_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
         ],
 
         'mariadb' => [
@@ -149,7 +165,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')) . '-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 
@@ -180,5 +196,11 @@ return [
         ],
 
     ],
-
+/**
+ * Multi-database — legacy/external DB
+ * Goal: connect a 2nd named connection to an EXISTING external database
+ * (not one we create/migrate) — e.g. an old system's DB, possibly a
+ * different driver (pgsql/sqlsrv). Likely read-only, no Laravel migrations
+ * against it, and its own connection block in config/database.php + .env.
+ */
 ];
