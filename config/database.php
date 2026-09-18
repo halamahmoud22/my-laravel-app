@@ -65,7 +65,7 @@ return [
         ],
 
         'logs' => [
-            'driver' => 'mysql',
+            'driver' => env('DB_LOGS_CONNECTION', 'mysql'),/* now configurable'*/
             'host' => env('DB_LOGS_HOST', '127.0.0.1'),
             'port' => env('DB_LOGS_PORT', '3306'),
             'database' => env('DB_LOGS_DATABASE', 'ecommerc_logs'),

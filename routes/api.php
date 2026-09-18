@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\PaymentController;
+
 
 Route::name('api.')->group(function () {
     // Public endpoints
@@ -26,8 +28,11 @@ Route::name('api.')->group(function () {
         Route::delete('cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
         Route::delete('cart', [CartController::class, 'clear'])->name('cart.clear');
 
-        // Orders endpoints
+        // payments endpoints
         Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store', 'update']);
+        // Orders endpoints
+        Route::post('/payments/intent', [PaymentController::class, 'createPaymentIntent']);
+        Route::post('/payments/charge', [PaymentController::class, 'charge']);
     });
 });
 
