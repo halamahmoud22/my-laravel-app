@@ -1,0 +1,128 @@
+/* ===== Base ===== */
+[data-bs-theme="dark"] {
+    background-color: #1e1e2e;
+    color: #e4e6ef;
+}
+
+[data-bs-theme="dark"] body {
+    background-color: #1e1e2e;
+    color: #e4e6ef;
+}
+
+/* ===== Cards & panels ===== */
+[data-bs-theme="dark"] .card {
+    background-color: #2b2b40;
+    border-color: #3f3f5a;
+}
+
+/* ===== Header & sidebar ===== */
+[data-bs-theme="dark"] .header,
+[data-bs-theme="dark"] .aside {
+    background-color: #1e1e2e;
+    border-color: #3f3f5a;
+}
+
+/* Sidebar menu items — active/hover states are the most visually important part
+   of a sidebar; without this, active links often stay a light-mode blue-on-white
+   that looks broken against a dark background */
+[data-bs-theme="dark"] .menu-link {
+    color: #92929f;
+}
+
+[data-bs-theme="dark"] .menu-link:hover,
+[data-bs-theme="dark"] .menu-link.active {
+    background-color: #2b2b40;
+    color: #ffffff;
+}
+
+/* ===== Text ===== */
+[data-bs-theme="dark"] .text-dark {
+    color: #e4e6ef !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #92929f !important;
+}
+
+/* ===== Tables ===== */
+/* Metronic tables often use a light striped/bordered look by default —
+   without overrides, rows stay white while everything around them goes dark */
+[data-bs-theme="dark"] .table {
+    color: #e4e6ef;
+    border-color: #3f3f5a;
+}
+
+[data-bs-theme="dark"] .table thead {
+    background-color: #2b2b40;
+    color: #92929f;
+}
+
+[data-bs-theme="dark"] .table tbody tr {
+    border-color: #3f3f5a;
+}
+
+[data-bs-theme="dark"] .table-hover tbody tr:hover {
+    background-color: #323248;
+}
+
+/* ===== Forms & inputs ===== */
+/* This is the classic "dark background, invisible text" trap —
+   inputs need both bg AND text color set, or typed text disappears */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #2b2b40;
+    border-color: #3f3f5a;
+    color: #e4e6ef;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #6d6d80;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #2b2b40;
+    border-color: #009ef7;
+    color: #566ac1;
+}
+
+/* ===== Dropdown menus ===== */
+/* Your user-profile dropdown and language switcher live here */
+[data-bs-theme="dark"] .menu-sub-dropdown {
+    background-color: #2b2b40;
+    border-color: #3f3f5a;
+}
+
+[data-bs-theme="dark"] .menu-sub-dropdown .menu-link:hover {
+    background-color: #323248;
+}
+
+/* ===== Buttons ===== */
+/* btn-light is the one Metronic button variant that assumes a white
+   background by design — it needs the most explicit override */
+[data-bs-theme="dark"] .btn-light,
+[data-bs-theme="dark"] .btn-icon.btn-light {
+    background-color: #2b2b40;
+    border-color: #434383;
+    color: #8899e2;
+}
+
+[data-bs-theme="dark"] .btn-light:hover {
+    background-color: #323248;
+}
+
+/* ===== Borders & separators ===== */
+[data-bs-theme="dark"] .separator {
+    border-color: #3f3f5a !important;
+}
+
+/* ===== Scrollbar ===== */
+/*   and looks like a visual bug against a dark page */
+[data-bs-theme="dark"] ::-webkit-scrollbar-track {
+    background: #1e1e2e;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #3f3f5a;
+    border-radius: 4px;
+}

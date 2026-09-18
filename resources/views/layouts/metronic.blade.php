@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-bs-theme="{{ auth()->user() && auth()->user()->theme === 'dark' ? 'dark' : 'light' }}">
 <head>
     <title>@yield('page-title', '') - {{ config('app.name') }}</title>
     <meta charset="utf-8" />
@@ -7,15 +7,17 @@
     <link rel="shortcut icon" href="{{ asset('assets/media/logos/favicon.ico') }}" />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
-
     <link href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
-
+    <link href="{{ asset('assets/css/style.bundle' . (app()->getLocale() === 'ar' ? '.rtl' : '') . '.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/dark-mode.css') }}" rel="stylesheet" type="text/css" />
     @stack('styles')
 </head>
+
 <body id="kt_body" class="header-tablet-and-mobile-fixed aside-enabled">
 
-    <script>var hostUrl = "{{ asset('assets/') }}/";</script>
+    <script>
+        var hostUrl = "{{ asset('assets/') }}/";
+    </script>
 
     <div class="d-flex flex-column flex-root">
         <div class="page d-flex flex-row flex-column-fluid">
@@ -38,8 +40,10 @@
         </div>
     </div>
 
+    @vite(['resources/js/app.js'])
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
     @stack('scripts')
 </body>
+
 </html>

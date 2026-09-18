@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <!-- MARKER-TEST-12345 -->
     <meta charset="utf-8" />
@@ -14,13 +15,21 @@
     <link href="{{ asset('assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
 </head>
-<body id="kt_body" style="background-color: rgb(9, 46, 133) !important;">
+
+<body id="kt_body" style="background-color: rgb(45, 148, 217) !important;">
     <div class="d-flex flex-column flex-column-fluid flex-lg-row">
         <div class="d-flex flex-column flex-lg-row-fluid">
             <div class="d-flex flex-center flex-column flex-column-fluid p-10 pb-lg-20">
 
-                <a href="{{ url('/') }}" class="mb-12">                    <img alt="Logo" src="{{ asset('assets/media/logos/logo-2.svg') }}" class="h-40px" />
+                <a href="{{ url('/') }}" class="mb-12">
+                    <img alt="Logo" src="{{ asset('assets/media/logos/logo-2.svg') }}" class="h-40px" />
                 </a>
+
+                <div class="d-flex align-items-center mb-6">
+                    <a href="{{ route('lang.switch', 'en') }}" class="text-white me-3">EN</a>
+                    <a href="{{ route('lang.switch', 'ar') }}" class="text-white">AR</a>
+                    {{-- THEME-TOGGLE-GOES-HERE --}}
+                </div>
 
                 <div class="w-lg-500px bg-body rounded shadow-sm p-10 p-lg-15 mx-auto">
                     {{ $slot }}
@@ -33,4 +42,5 @@
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
 </body>
+
 </html>

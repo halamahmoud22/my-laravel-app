@@ -11,7 +11,7 @@
                     <span class="text-white fs-6 fw-bold">{{ auth()->user()->name }}</span>
                     <span class="text-gray-600 fw-bold d-block fs-8 mb-1">{{ auth()->user()->email }}</span>
                     <div class="d-flex align-items-center text-success fs-9">
-                        <span class="bullet bullet-dot bg-success me-1"></span>online
+                        <span class="bullet bullet-dot bg-success me-1"></span>{{ __('user.online') }}
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@
                                     </svg>
                                 </span>
                             </span>
-                            <span class="menu-title">Dashboard</span>
+                            <span class="menu-title">{{ __('store.dashboard') }}</span>
                         </a>
                     </div>
                 @endcan
@@ -55,7 +55,7 @@
                 {{-- Store section (for all) --}}
                 <div class="menu-item">
                     <div class="menu-content pt-8 pb-2">
-                        <span class="menu-section text-muted text-uppercase fs-8 ls-1">Store</span>
+                        <span class="menu-section text-muted text-uppercase fs-8 ls-1">{{ __('store.store') }}</span>
                     </div>
                 </div>
 
@@ -63,7 +63,7 @@
                     <a class="menu-link {{ request()->routeIs('categories.index', 'categories.show') ? 'active' : '' }}"
                         href="{{ route('categories.index') }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                        <span class="menu-title">Categories</span>
+                        <span class="menu-title">{{ __('store.categories') }}</span>
                     </a>
                 </div>
 
@@ -71,14 +71,14 @@
                     <a class="menu-link {{ request()->routeIs('products.index', 'products.show') ? 'active' : '' }}"
                         href="{{ route('products.index') }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                        <span class="menu-title">Products</span>
+                        <span class="menu-title">{{ __('store.products') }}</span>
                     </a>
                 </div>
 
                 {{-- Account section (for all logged-in users) --}}
                 <div class="menu-item">
                     <div class="menu-content pt-8 pb-2">
-                        <span class="menu-section text-muted text-uppercase fs-8 ls-1">Account</span>
+                        <span class="menu-section text-muted text-uppercase fs-8 ls-1">{{ __('user.account') }}</span>
                     </div>
                 </div>
 
@@ -86,7 +86,7 @@
                     <a class="menu-link {{ request()->routeIs('cart.index') ? 'active' : '' }}"
                         href="{{ route('cart.index') }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                        <span class="menu-title">Cart</span>
+                        <span class="menu-title">{{ __('store.cart') }}</span>
                     </a>
                 </div>
 
@@ -94,7 +94,7 @@
                     <a class="menu-link {{ request()->routeIs('orders.*') && (request()->boolean('my_orders') || !auth()->user()?->isAdmin()) ? 'active' : '' }}"
                         href="{{ route('orders.index', auth()->user()?->isAdmin() ? ['my_orders' => 1] : []) }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                        <span class="menu-title">My Orders</span>
+                        <span class="menu-title">{{ __('store.orders') }}</span>
                     </a>
                 </div>
 
@@ -102,7 +102,7 @@
                     <a class="menu-link {{ request()->routeIs('payments.index', 'payments.show') ? 'active' : '' }}"
                         href="{{ route('payments.index') }}">
                         <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                        <span class="menu-title">Payments</span>
+                        <span class="menu-title">{{ __('store.payments') }}</span>
                     </a>
                 </div>
 
@@ -110,7 +110,7 @@
                 @can('admin')
                     <div class="menu-item">
                         <div class="menu-content pt-8 pb-2">
-                            <span class="menu-section text-muted text-uppercase fs-8 ls-1">Admin</span>
+                            <span class="menu-section text-muted text-uppercase fs-8 ls-1">{{ __('user.admin') }}</span>
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@
                         <a class="menu-link {{ request()->routeIs('orders.*') && !request()->boolean('my_orders') ? 'active' : '' }}"
                             href="{{ route('orders.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                            <span class="menu-title">View All Orders</span>
+                            <span class="menu-title">{{ __('store.manage_orders') }}</span>
                         </a>
                     </div>
                 @endcan
@@ -127,7 +127,7 @@
                 @can('super-admin')
                     <div class="menu-item">
                         <div class="menu-content pt-8 pb-2">
-                            <span class="menu-section text-muted text-uppercase fs-8 ls-1">Super Admin</span>
+                            <span class="menu-section text-muted text-uppercase fs-8 ls-1">{{ __('user.super_admin') }}</span>
                         </div>
                     </div>
 
@@ -135,7 +135,7 @@
                         <a class="menu-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
                             href="{{ route('admin.users.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                            <span class="menu-title">Manage Admins</span>
+                            <span class="menu-title">{{ __('user.manage_admins') }}</span>
                         </a>
                     </div>
                 @endcan

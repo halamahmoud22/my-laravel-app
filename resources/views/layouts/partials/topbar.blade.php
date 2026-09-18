@@ -49,7 +49,12 @@
             </div>
         </div>
     </div>
-
+    <!-- Theme Switcher -->
+    <div class="d-flex align-items-center ms-1 me-3">
+        <button id="theme-toggle" class="btn btn-icon btn-sm btn-light" type="button">
+            <i class="bi bi-moon-stars" id="theme-icon"></i>
+        </button>
+    </div>
     <div class="toolbar">
         <div
             class="container-fluid py-6 py-lg-0 d-flex flex-column flex-lg-row align-items-lg-stretch justify-content-lg-between">
@@ -57,7 +62,7 @@
                 <h1 class="d-flex flex-column text-dark fw-bolder fs-3 mb-0">@yield('page-title', 'The Store Name')</h1>
                 <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 pt-1">
                     <li class="breadcrumb-item text-muted">
-                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">Home</a>
+                        <a href="{{ route('home') }}" class="text-muted text-hover-primary">{{ __('store.home')}}</a>
                     </li>
                     <li class="breadcrumb-item">
                         <span class="bullet bg-gray-200 w-5px h-2px"></span>
@@ -68,6 +73,15 @@
             <!-- the user menu block -->
             @auth
                 <div class="d-flex align-items-center py-3 py-lg-0">
+                    <!-- Language Switcher -->
+                    <div class="d-flex align-items-center ms-1 me-3">
+                        <a href="{{ route('lang.switch', 'en') }}"
+                            class="btn btn-sm {{ app()->getLocale() === 'en' ? 'btn-primary' : 'btn-light' }} px-3 py-1">{{ __('user.en') }}</a>
+                        <span class="mx-1 text-muted">|</span>
+                        <a href="{{ route('lang.switch', 'ar') }}"
+                            class="btn btn-sm {{ app()->getLocale() === 'ar' ? 'btn-primary' : 'btn-light' }} px-3 py-1">{{ __('user.ar') }}</a>
+                    </div>
+
                     <div class="d-flex align-items-center ms-1" data-kt-menu-trigger="click"
                         data-kt-menu-placement="bottom-end">
                         <div class="symbol symbol-50px me-5">
@@ -75,7 +89,7 @@
                                 src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : asset('assets/media/avatars/blank.png') }}" />
                         </div>
                     </div>
-            @endauth
+                @endauth
 
                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold py-4 fs-6 w-275px"
                     data-kt-menu="true">
@@ -96,7 +110,8 @@
                                 </div>
                             @else
                                 <div class="d-flex flex-column">
-                                    <a href="{{ route('login') }}" class="btn btn-sm btn-primary">Login</a>
+                                    <a href="{{ route('login') }}"
+                                        class="btn btn-sm btn-primary">{{ __('user.login') }}</a>
                                 </div>
                             @endauth
                         </div>
@@ -105,7 +120,7 @@
                     <div class="separator my-2"></div>
 
                     <div class="menu-item px-5">
-                        <a href="{{ route('profile.edit') }}" class="menu-link px-5">My Profile</a>
+                        <a href="{{ route('profile.edit') }}" class="menu-link px-5">{{ __('user.profile') }}</a>
                     </div>
 
                     <div class="separator my-2"></div>
@@ -114,14 +129,13 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="menu-link px-5 w-100 text-start border-0 bg-transparent">
-                                Sign Out
+                                {{ __('user.sign_out') }}
                             </button>
                         </form>
                     </div>
 
                 </div>
             </div>
-            <!-- END PASTE -->
         </div>
     </div>
 </div>
