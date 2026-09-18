@@ -6,11 +6,10 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 
-class AdminUserController extends Controller implements HasMiddleware
-{
-    public static function middleware(): array
+class AdminUserController extends Controller{
+    public function __construct()
     {
-        return ['can:manage-admins'];
+        $this->middleware('can:manage-admins');
     }
 
     /**
