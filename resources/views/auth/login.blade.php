@@ -3,16 +3,16 @@
         @csrf
 
         <div class="text-center mb-10">
-            <h1 class="text-dark mb-3">Sign In</h1>
-            <div class="text-gray-400 fw-bold fs-4">New Here?
-                <a href="{{ route('register') }}" class="link-primary fw-bolder">Create an Account</a>
+            <h1 class="text-dark mb-3">{{ __('user.sign_in') }}</h1>
+            <div class="text-gray-400 fw-bold fs-4">{{ __('user.new_here') }}
+                <a href="{{ route('register') }}" class="link-primary fw-bolder">{{ __('user.create_account') }}</a>
             </div>
         </div>
 
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
         <div class="fv-row mb-10">
-            <label for="email" class="form-label fs-6 fw-bolder text-dark">Email</label>
+            <label for="email" class="form-label fs-6 fw-bolder text-dark">{{ __('user.email') }}</label>
             <input id="email" class="form-control form-control-lg form-control-solid"
                     type="email" name="email" value="{{ old('email') }}"
                     required autofocus autocomplete="username" />
@@ -23,9 +23,9 @@
 
         <div class="fv-row mb-10">
             <div class="d-flex flex-stack mb-2">
-                <label for="password" class="form-label fw-bolder text-dark fs-6 mb-0">Password</label>
+                <label for="password" class="form-label fw-bolder text-dark fs-6 mb-0">{{ __('user.password') }}</label>
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="link-primary fs-6 fw-bolder">Forgot Password?</a>
+                    <a href="{{ route('password.request') }}" class="link-primary fs-6 fw-bolder">{{ __('user.forgot_password') }}?</a>
                 @endif
             </div>
             <input id="password" class="form-control form-control-lg form-control-solid"
@@ -39,13 +39,13 @@
         <div class="fv-row mb-10">
             <label class="form-check form-check-custom form-check-solid form-check-inline">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember_me">
-                <span class="form-check-label fw-bold text-gray-700 fs-6">Remember me</span>
+                <span class="form-check-label fw-bold text-gray-700 fs-6">{{ __('user.remember_me') }}</span>
             </label>
         </div>
 
         <div class="text-center">
             <button type="submit" class="btn btn-lg btn-primary w-100">
-                Continue
+                {{ __('user.continue') }}
             </button>
         </div>
     </form>

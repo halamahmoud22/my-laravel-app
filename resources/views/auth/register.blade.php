@@ -3,14 +3,14 @@
         @csrf
 
         <div class="mb-10 text-center">
-            <h1 class="text-dark mb-3">Create an Account</h1>
-            <div class="text-gray-400 fw-bold fs-4">Already have an account?
-                <a href="{{ route('login') }}" class="link-primary fw-bolder">Sign in here</a>
+            <h1 class="text-dark mb-3">{{ __('user.create_account') }}</h1>
+            <div class="text-gray-400 fw-bold fs-4">{{ __('user.already_have_account') }}
+                <a href="{{ route('login') }}" class="link-primary fw-bolder">{{ __('user.sign_in_here') }}</a>
             </div>
         </div>
 
         <div class="fv-row mb-7">
-            <label for="name" class="form-label fw-bolder text-dark fs-6">Name</label>
+            <label for="name" class="form-label fw-bolder text-dark fs-6">{{ __('user.name') }}</label>
             <input id="name" class="form-control form-control-lg form-control-solid"
                     type="text" name="name" value="{{ old('name') }}"
                     required autofocus autocomplete="name" />
@@ -20,7 +20,7 @@
         </div>
 
         <div class="fv-row mb-7">
-            <label for="email" class="form-label fw-bolder text-dark fs-6">Email</label>
+            <label for="email" class="form-label fw-bolder text-dark fs-6">{{ __('user.email') }}</label>
             <input id="email" class="form-control form-control-lg form-control-solid"
                     type="email" name="email" value="{{ old('email') }}"
                     required autocomplete="username" />
@@ -30,7 +30,7 @@
         </div>
 
         <div class="fv-row mb-7">
-            <label for="password" class="form-label fw-bolder text-dark fs-6">Password</label>
+            <label for="password" class="form-label fw-bolder text-dark fs-6">{{ __('user.password') }}</label>
             <input id="password" class="form-control form-control-lg form-control-solid"
                     type="password" name="password"
                     required autocomplete="new-password" />
@@ -40,7 +40,7 @@
         </div>
 
         <div class="fv-row mb-10">
-            <label for="password_confirmation" class="form-label fw-bolder text-dark fs-6">Confirm Password</label>
+            <label for="password_confirmation" class="form-label fw-bolder text-dark fs-6">{{ __('user.confirm_password') }}</label>
             <input id="password_confirmation" class="form-control form-control-lg form-control-solid"
                     type="password" name="password_confirmation"
                     required autocomplete="new-password" />
@@ -51,7 +51,7 @@
 
         <div class="text-center">
             <button type="submit" class="btn btn-lg btn-primary w-100">
-                Submit
+                {{ __('user.submit') }}
             </button>
         </div>
     </form>
