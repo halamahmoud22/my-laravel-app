@@ -12,7 +12,16 @@ use App\Http\Controllers\HomeController;
 
 use Illuminate\Support\Facades\Route;
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+Route::get('/lang/{locale}', function (string $locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        session(['locale' => $locale]);
+    }
+    return back();
+})->name('lang.switch');
+
+Route::get('/theme/toggle', [HomeController::class, 'toggleTheme'])->name('theme.toggle');
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

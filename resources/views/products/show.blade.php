@@ -25,40 +25,40 @@
                             <div class="card card-flush">
                                 <div class="card-header border-0 pt-6">
                                     <h3 class="card-title align-items-start flex-column">
-                                        <span class="card-label fw-bold text-gray-900">Product Details</span>
+                                        <span class="card-label fw-bold text-gray-900">{{ __('store.product_details') }}</span>
                                     </h3>
                                 </div>
                                 <div class="card-body pt-0">
                                     <div class="row mb-8">
                                         <div class="col-lg-6">
                                             <div class="mb-6">
-                                                <label class="form-label fw-bold text-gray-900 mb-3">Category</label>
+                                                <label class="form-label fw-bold text-gray-900 mb-3">{{ __('store.category') }}</label>
                                                 <span class="badge badge-light-primary fw-bold fs-8 px-3 py-2">
                                                     {{ $product->category->name }}
                                                 </span>
                                             </div>
                                             <div class="mb-6">
-                                                <label class="form-label fw-bold text-gray-900 mb-3">Price</label>
+                                                <label class="form-label fw-bold text-gray-900 mb-3">{{ __('store.price') }}</label>
                                                 <span
                                                     class="fw-bold text-gray-900 fs-5">${{ number_format($product->price, 2) }}</span>
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="mb-6">
-                                                <label class="form-label fw-bold text-gray-900 mb-3">Stock</label>
+                                                <label class="form-label fw-bold text-gray-900 mb-3">{{ __('store.stock') }}</label>
                                                 <span class="fw-bold text-gray-900 fs-5">
                                                     @if ($product->stock > 0)
                                                         <span class="badge badge-light-success">{{ $product->stock }}
                                                             units</span>
                                                     @else
-                                                        <span class="badge badge-light-danger">Out of Stock</span>
+                                                        <span class="badge badge-light-danger">{{ __('store.out_of_stock') }}</span>
                                                     @endif
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mb-6">
-                                        <label class="form-label fw-bold text-gray-900 mb-3">Description</label>
+                                        <label class="form-label fw-bold text-gray-900 mb-3">{{ __('store.product_description') }}</label>
                                         <p class="text-gray-700">{{ $product->description }}</p>
                                     </div>
                                 </div>
@@ -77,29 +77,24 @@
                             </div>
 
                             <div class="card card-flush">
-                                <div class="card-header border-0 pt-6">
-                                    <h3 class="card-title">
-                                        <span class="card-label fw-bold text-gray-900">Actions</span>
-                                    </h3>
-                                </div>
                                 <div class="card-body pt-0">
                                     <!-- Add to Cart -->
                                     @if ($product->stock > 0)
                                         <div class="d-flex gap-3 mt-5">
-                                            <a href="{{ route('home') }}" class="btn btn-light">Continue Shopping</a>
+                                            <a href="{{ route('home') }}" class="btn btn-light">{{ __('store.continue_shopping') }}</a>
 
                                             @auth
                                                 <form action="{{ route('cart.add', $product) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                                    <button type="submit" class="btn btn-primary">{{ __('store.add_to_cart') }}</button>
                                                 </form>
                                             @else
-                                                <a href="{{ route('login') }}" class="btn btn-primary">Log in to add to cart</a>
+                                                <a href="{{ route('login') }}" class="btn btn-primary">{{ __('store.login_to_purchase') }}</a>
                                             @endauth
                                         </div>
                                     @else
                                         <button type="button" class="btn btn-secondary w-100" disabled>
-                                            Out of Stock
+                                            {{ __('store.out_of_stock') }}
                                         </button>
                                     @endif
 
@@ -120,7 +115,7 @@
                                                             stroke-linecap="round" stroke-linejoin="round" />
                                                     </svg>
                                                 </span>
-                                                Edit Product
+                                                {{ __('user.edit') }} {{ __('store.product') }}
                                             </a>
                                         </div>
                                         <form action="{{ route('admin.products.destroy', $product->id) }}" method="POST">
@@ -137,7 +132,7 @@
                                                             stroke-linejoin="round" />
                                                     </svg>
                                                 </span>
-                                                Delete Product
+                                                {{ __('user.delete') }} {{ __('store.product') }}
                                             </button>
                                         </form>
                                     @endcan

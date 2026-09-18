@@ -9,7 +9,7 @@
                 <div class="app-container container-xxl d-flex align-items-center">
                     <div class="d-flex align-items-center flex-grow-1">
                         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                            Products
+                            {{ __('store.products') }}
                         </h1>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                 </i>
-                                Add Product
+                                {{ __('store.add_product') }}
                             </a>
                         @endcan
                     </div>
@@ -37,8 +37,8 @@
                             <table class="table table-row-dashed table-row-gray-300 gy-7">
                                 <thead>
                                     <tr class="fw-bold fs-6 text-gray-800">
-                                        <th>Product Name</th>
-                                        <th>Price</th>
+                                        <th>{{ __('store.product_name') }}</th>
+                                        <th>{{ __('store.price') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,7 +63,7 @@
                                                             <span class="path1"></span>
                                                             <span class="path2"></span>
                                                         </i>
-                                                        Edit
+                                                        {{ __('user.edit') }}
                                                     </a>
                                                 @endcan
                                                 @can('delete', $product)
@@ -76,7 +76,7 @@
                                                                 <span class="path1"></span>
                                                                 <span class="path2"></span>
                                                             </i>
-                                                            Delete
+                                                            {{ __('user.delete') }}
                                                         </button>
                                                     </form>
                                                 @endcan

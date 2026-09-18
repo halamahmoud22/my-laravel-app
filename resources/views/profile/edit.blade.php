@@ -8,7 +8,7 @@
             <div class="app-container container-xxl d-flex align-items-center">
                 <div class="d-flex align-items-center flex-grow-1">
                     <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                        Profile Settings
+                        {{ __('user.profile_settings') }}
                     </h1>
                 </div>
             </div>

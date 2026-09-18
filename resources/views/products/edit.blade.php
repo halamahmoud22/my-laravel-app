@@ -8,7 +8,7 @@
             <div class="app-container container-xxl d-flex align-items-center">
                 <div class="d-flex align-items-center flex-grow-1">
                     <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                        Edit Product
+                        {{ __('user.edit') }} {{ __('store.product') }}
                     </h1>
                 </div>
             </div>
@@ -35,24 +35,24 @@
                             @method('PUT')
 
                             <div class="fv-row mb-10">
-                                <label class="required form-label">Name</label>
-                                <input type="text" name="name" value="{{ old('name', $product->name) }}" class="form-control" placeholder="Enter product name">
+                                <label class="required form-label">{{ __('user.name') }}</label>
+                                <input type="text" name="name" value="{{ old('name', $product->name) }}" class="form-control" placeholder="{{ __('store.enter_product_name')}}">
                             </div>
 
                             <div class="fv-row mb-10">
-                                <label class="required form-label">Price</label>
+                                <label class="required form-label">{{ __('store.price') }}</label>
                                 <input type="number" step="0.01" name="price" value="{{ old('price', $product->price) }}" class="form-control" placeholder="0.00">
                             </div>
 
                             <div class="fv-row mb-10">
-                                <label class="required form-label">Stock</label>
+                                <label class="required form-label">{{ __('store.stock') }}</label>
                                 <input type="number" name="stock" value="{{ old('stock', $product->stock) }}" class="form-control" placeholder="0">
                             </div>
 
                             <div class="fv-row mb-10">
-                                <label class="required form-label">Category</label>
+                                <label class="required form-label">{{ __('store.category') }}</label>
                                 <select name="category_id" class="form-select">
-                                    <option value="">Select a category</option>
+                                    <option value="">{{ __('store.select_category') }}</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                                             {{ $category->name }}
@@ -62,12 +62,12 @@
                             </div>
 
                             <div class="fv-row mb-10">
-                                <label class="form-label">Description</label>
-                                <textarea name="description" class="form-control" rows="3" placeholder="Enter product description">{{ old('description', $product->description) }}</textarea>
+                                <label class="form-label">{{ __('store.product_description') }}</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="{{ __('store.enter_product_description') }}">{{ old('description', $product->description) }}</textarea>
                             </div>
 
                             <div class="fv-row mb-10">
-                                <label class="form-label">Product Image (e.g. 1.png - 22.png or custom filename)</label>
+                                <label class="form-label">{{ __('store.image') }} {{ __('store.product') }} (e.g. 1.png - 22.png)</label>
                                 <div class="d-flex align-items-center gap-4">
                                     <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
                                     <input type="text" name="image" value="{{ old('image', $product->image) }}" class="form-control" placeholder="1.png">
@@ -75,8 +75,8 @@
                             </div>
 
                             <div class="d-flex justify-content-end">
-                                <a href="{{ route('products.index') }}" class="btn btn-light me-3">Cancel</a>
-                                <button type="submit" class="btn btn-primary">Update Product</button>
+                                <a href="{{ route('products.index') }}" class="btn btn-light me-3">{{ __('user.cancel') }}</a>
+                                <button type="submit" class="btn btn-primary">{{ __('store.update') }} {{ __('store.product') }}</button>
                             </div>
                         </form>
 

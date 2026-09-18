@@ -1,15 +1,14 @@
 <div class="card card-flush mb-6">
     <div class="card-header border-0 pt-6">
         <h3 class="card-title align-items-start flex-column">
-            <span class="card-label fw-bold text-gray-900">Profile Information</span>
-            <span class="text-muted mt-1 fw-semibold fs-7">Update your account's profile information and email
-                address</span>
+            <span class="card-label fw-bold text-gray-900">{{ __('user.profile_information') }}</span>
+            <span class="text-muted mt-1 fw-semibold fs-7">{{ __('user.profile_info_subtitle') }}</span>
         </h3>
     </div>
     <div class="card-body pt-0">
         @if (session('status') === 'profile-updated')
             <div class="alert alert-success mb-6">
-                <span>{{ __('Your profile has been updated successfully.') }}</span>
+                <span>{{ __('user.profile_updated_success') }}</span>
             </div>
         @endif
 
@@ -45,7 +44,7 @@
             </div>
             {{-- ...unchanged... --}}
             <div class="fv-row mb-10">
-                <label class="required form-label">Name</label>
+                <label class="required form-label">{{ __('user.name') }}</label>
                 <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}"
                     class="form-control" placeholder="Enter your name" required autofocus autocomplete="name" />
                 @error('name')
@@ -54,7 +53,7 @@
             </div>
 
             <div class="fv-row mb-10">
-                <label class="required form-label">Email</label>
+                <label class="required form-label">{{ __('user.email') }}</label>
                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}"
                     class="form-control" placeholder="Enter your email" required autocomplete="username" />
                 @error('email')
@@ -64,7 +63,7 @@
 
             <div class="d-flex align-items-center">
                 <button type="submit" class="btn btn-primary">
-                    Save Changes
+                    {{ __('user.save_changes') }}
                 </button>
             </div>
         </form>
