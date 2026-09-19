@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\Order;
 use Illuminate\Auth\Access\Response;
 
 class PaymentPolicy
@@ -22,17 +23,18 @@ class PaymentPolicy
     public function view(User $user, Payment $payment): bool
     {
         return $user->id === $payment->order->user_id
-        || $user->role === 'admin'
-        || $user->role === 'super_admin';
+            || $user->role === 'admin'
+            || $user->role === 'super_admin';
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, Order $order): bool
     {
-        // payments are created by your payment/webhook flow, not directly by a user through a form
-        return false;
+        return $user->id === $order->user_id
+            || $user->role === 'admin'
+            || $user->role === 'super_admin';
     }
 
     /**

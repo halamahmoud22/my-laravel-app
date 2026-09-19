@@ -7,15 +7,23 @@ use App\Http\Controllers\Api\ProductsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\AuthController;
+
 
 
 Route::name('api.')->group(function () {
     // Public endpoints
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+
     Route::apiResource('products', ProductsController::class)->only(['index', 'show']);
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 
     // Protected endpoints (requires Bearer token)
     Route::middleware('auth:sanctum')->group(function () {
+         // Logout requires a token to know *which* token to revoke
+        Route::post('/logout', [AuthController::class, 'logout']);
+
         Route::apiResource('products', ProductsController::class)->except(['index', 'show']);
         Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
 

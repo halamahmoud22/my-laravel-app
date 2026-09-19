@@ -35,13 +35,13 @@ class PaymentController extends Controller
      */
     public function store(Request $request, Order $order)
     {
-        $this->authorize('view', $order);      // must actually own this order (or be admin)
-        $this->authorize('create', Payment::class);
+        $this->authorize('view', $order);
+        $this->authorize('create', [Payment::class, $order]);   // ← changed
 
         $payment = Payment::create([
             'order_id' => $order->id,
             'amount' => $order->total,
-            'payment_method' => 'card',  // default payment method (simulated)
+            'payment_method' => 'card',
             'status' => 'completed',
             'transaction_id' => 'txn_' . uniqid(),
         ]);

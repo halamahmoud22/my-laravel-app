@@ -7,8 +7,12 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://127.0.0.1:8000",
             "description": "API server"
+        },
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Local dev server"
         }
     ],
     "paths": {
@@ -830,6 +834,112 @@
                 ]
             }
         },
+        "/api/payments/intent": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create a Stripe PaymentIntent",
+                "description": "Creates a PaymentIntent and returns its client_secret so the frontend can confirm payment via Stripe.js.",
+                "operationId": "c4ee24ba411ca51e956f54e5b375f9c1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order_id",
+                                    "currency"
+                                ],
+                                "properties": {
+                                    "order_id": {
+                                        "description": "ID of the order to charge",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "usd",
+                                        "maxLength": 3,
+                                        "minLength": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "PaymentIntent created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "client_secret": {
+                                            "type": "string",
+                                            "example": "pi_3P.._secret_XXXX"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "example": "pi_3P..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or Stripe API error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "order not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/products": {
             "get": {
                 "tags": [
@@ -1059,6 +1169,10 @@
         {
             "name": "Orders",
             "description": "Orders"
+        },
+        {
+            "name": "Payments",
+            "description": "Payments"
         },
         {
             "name": "Products",

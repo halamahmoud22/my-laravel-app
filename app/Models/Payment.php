@@ -10,4 +10,6 @@ class Payment extends Model
     {
         return $this->belongsTo(Order::class);
     }
+    protected $fillable = ['order_id', 'amount', 'payment_method', 'status', 'transaction_id'];
+
 }

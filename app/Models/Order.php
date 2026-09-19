@@ -18,6 +18,6 @@ class Order extends Model
     {
         return $this->hasOne(Payment::class);
     }
-    protected $fillable = ['user_id', 'total', 'status'];
+    protected $fillable = ['user_id', 'total', 'status',];
 }
 

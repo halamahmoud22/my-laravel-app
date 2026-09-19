@@ -23,6 +23,7 @@ use OpenApi\Attributes as OA;
     bearerFormat: "JWT",
     description: "Enter the token you received from /api/login, without the word 'Bearer'."
 )]
+#[OA\Server(url: 'http://127.0.0.1:8000', description: 'Local dev server')]
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
