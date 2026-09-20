@@ -9,12 +9,10 @@ use Illuminate\Auth\Access\Response;
 
 class PaymentPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
+
     public function viewAny(User $user): bool
     {
-        return $user->role === 'admin' || $user->role === 'super_admin';
+        return true; // Any authenticated user can view the payments index
     }
 
     /**
@@ -32,9 +30,7 @@ class PaymentPolicy
      */
     public function create(User $user, Order $order): bool
     {
-        return $user->id === $order->user_id
-            || $user->role === 'admin'
-            || $user->role === 'super_admin';
+        return $user->id === $order->user_id;
     }
 
     /**

@@ -9,41 +9,75 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\AuthController;
 
-
-
+// All routes here are prefixed with the 'api.' route name (e.g. api.login, api.cart.index)
 Route::name('api.')->group(function () {
-    // Public endpoints
+
+    // --- Public endpoints (no token required) ---
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
 
+    // Anyone can browse products/categories without logging in
     Route::apiResource('products', ProductsController::class)->only(['index', 'show']);
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 
-    // Protected endpoints (requires Bearer token)
+    // --- Protected endpoints (requires a valid Sanctum Bearer token) ---
     Route::middleware('auth:sanctum')->group(function () {
-         // Logout requires a token to know *which* token to revoke
+
+        // Logout requires a token so Sanctum knows *which* token to revoke
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        Route::apiResource('products', ProductsController::class)->except(['index', 'show']);
-        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+        // --- Products: write actions ---
+        // Split into individual routes (instead of apiResource->except) because
+        // store/update/destroy each need a DIFFERENT permission - a single
+        // apiResource middleware call can't vary permission per HTTP method
+        Route::post('products', [ProductsController::class, 'store'])
+            ->middleware('permission:products.create')->name('products.store');
 
-        // Cart endpoints
+        Route::put('products/{product}', [ProductsController::class, 'update'])
+            ->middleware('permission:products.update')->name('products.update');
+        Route::patch('products/{product}', [ProductsController::class, 'update'])
+            ->middleware('permission:products.update'); // same handler as PUT
+
+        Route::delete('products/{product}', [ProductsController::class, 'destroy'])
+            ->middleware('permission:products.delete')->name('products.destroy');
+
+        // --- Categories: write actions ---
+        // Same reasoning as Products above - split by method so each action
+        // checks its own permission
+        Route::post('categories', [CategoryController::class, 'store'])
+            ->middleware('permission:categories.create')->name('categories.store');
+
+        Route::put('categories/{category}', [CategoryController::class, 'update'])
+            ->middleware('permission:categories.update')->name('categories.update');
+        Route::patch('categories/{category}', [CategoryController::class, 'update'])
+            ->middleware('permission:categories.update');
+
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])
+            ->middleware('permission:categories.delete')->name('categories.destroy');
+        // --- Cart endpoints ---
+        // Cart is always scoped to the logged-in user, so no extra permission
+        // middleware needed here - ownership is enforced inside the controller
         Route::get('cart', [CartController::class, 'index'])->name('cart.index');
         Route::post('cart', [CartController::class, 'store'])->name('cart.store');
         Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
         Route::put('cart/{cart}', [CartController::class, 'update'])->name('cart.update');
-        Route::patch('cart/{cart}', [CartController::class, 'update']);
+        Route::patch('cart/{cart}', [CartController::class, 'update']); // same handler as PUT
         Route::delete('cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
         Route::delete('cart', [CartController::class, 'clear'])->name('cart.clear');
 
-        // payments endpoints
+        // --- Orders endpoints ---
+        // No 'destroy' - orders are never deleted, only transitioned through
+        // their status lifecycle (pending -> paid -> shipped -> completed/cancelled)
         Route::apiResource('orders', OrderController::class)->only(['index', 'show', 'store', 'update']);
-        // Orders endpoints
+
+        // --- Payment endpoints ---
+        // Two-step Stripe-style flow: create a payment intent first, then charge it
         Route::post('/payments/intent', [PaymentController::class, 'createPaymentIntent']);
         Route::post('/payments/charge', [PaymentController::class, 'charge']);
     });
 });
 
+// Simple endpoint to fetch the currently authenticated user from their token
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');

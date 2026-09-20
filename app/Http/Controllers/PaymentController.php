@@ -17,7 +17,19 @@ class PaymentController extends Controller
     public function index()
     {
         $this->authorize('viewAny', Payment::class);
-        $payments = Payment::latest()->paginate(10);
+
+        $user = auth()->user();
+        $isAdmin = $user && in_array($user->role, ['admin', 'super_admin']);
+
+        $query = Payment::with('order')->latest();
+
+        if (! $isAdmin) {
+            $query->whereHas('order', function ($q) {
+                $q->where('user_id', auth()->id());
+            });
+        }
+
+        $payments = $query->paginate(10);
         return view('payments.index', compact('payments'));
     }
 

@@ -121,6 +121,7 @@
                             <span class="menu-title">{{ __('store.manage_orders') }}</span>
                         </a>
                     </div>
+                    
                 @endcan
 
                 {{-- Super Admin section --}}

@@ -940,6 +940,118 @@
                 ]
             }
         },
+        "/api/payments/charge": {
+            "post": {
+                "tags": [
+                    "Payments"
+                ],
+                "summary": "Create and immediately confirm a Stripe charge",
+                "description": "Creates a PaymentIntent and confirms it in the same request using an existing payment_method (no client-side confirmation step needed).",
+                "operationId": "40873519bd7e0c0a8ae70f19a3b42a78",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order_id",
+                                    "currency",
+                                    "payment_method"
+                                ],
+                                "properties": {
+                                    "order_id": {
+                                        "description": "ID of the order to charge",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "currency": {
+                                        "type": "string",
+                                        "example": "usd",
+                                        "maxLength": 3,
+                                        "minLength": 3
+                                    },
+                                    "payment_method": {
+                                        "description": "Stripe PaymentMethod ID",
+                                        "type": "string",
+                                        "example": "pm_card_visa"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Charge created and confirmed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "example": "succeeded"
+                                        },
+                                        "id": {
+                                            "type": "string",
+                                            "example": "pi_3P..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or Stripe API error (e.g. card declined)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "order not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/products": {
             "get": {
                 "tags": [

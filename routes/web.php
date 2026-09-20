@@ -59,7 +59,6 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    // ... your existing orders routes probably already sit in a group like this
 
     Route::post('/orders/{order}/payment', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');

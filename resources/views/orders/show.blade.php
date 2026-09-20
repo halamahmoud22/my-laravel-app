@@ -62,13 +62,14 @@
 
             <div class="d-flex justify-content-between align-items-center mt-5">
                 <h4 class="mb-0">{{ __('store.total') }}: ${{ number_format($order->total, 2) }}</h4>
-
-                @if ($order->status === 'pending')
-                    <form action="{{ route('payments.store', $order) }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-success">{{ __('store.pay_now') }}</button>
-                    </form>
-                @endif
+                @can('create', [\App\Models\Payment::class, $order])
+                    @if ($order->status === 'pending')
+                        <form action="{{ route('payments.store', $order) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-success">{{ __('store.pay_now') }}</button>
+                        </form>
+                    @endif
+                @endcan
             </div>
         </div>
     </div>
