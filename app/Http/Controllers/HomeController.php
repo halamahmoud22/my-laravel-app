@@ -1,14 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Product;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Cache;
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(12);
+        $page = $request->get('page', 1);
+        $products = Cache::remember("home_products_page_{$page}", now()->addMinutes(15), function () {
+            return Product::with('category')->latest()->paginate(12);
+        });
 
         // Branch: logged-in users see home (Metronic layout), guests see welcome
         if (auth()->check()) {

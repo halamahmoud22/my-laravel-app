@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
 
 class ProductController extends Controller
 {
@@ -48,7 +49,9 @@ class ProductController extends Controller
     public function create()
     {
         $this->authorize('create', Product::class);
-        $categories = Category::all();
+        $categories = Cache::remember('all_categories', now()->addHours(24), function () {
+            return Category::all();
+        });
         return view('products.create', compact('categories'));
     }
 
@@ -75,7 +78,9 @@ class ProductController extends Controller
     public function show(string $id)
     {
         // Public browsing - no authorization needed
-        $product = Product::findOrFail($id);
+        $product = Cache::remember("product_{$id}", now()->addHours(6), function () use ($id) {
+            return Product::with('category')->findOrFail($id);
+        });
         return view('products.show', compact('product'));
     }
 
@@ -86,7 +91,9 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $this->authorize('update', $product);
-        $categories = Category::all();
+        $categories = Cache::remember('all_categories', now()->addHours(24), function () {
+            return Category::all();
+        });
         return view('products.edit', compact('product', 'categories'));
     }
 

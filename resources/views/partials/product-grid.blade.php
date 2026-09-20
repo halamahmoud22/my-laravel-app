@@ -56,7 +56,7 @@
     @endforelse
 </div>
 
-@if ($products->hasPages())
+@if (method_exists($products, 'hasPages') && $products->hasPages())
     <div class="d-flex justify-content-center mt-10">{{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 @endif

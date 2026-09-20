@@ -6,6 +6,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -16,13 +17,13 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         // Public browsing - no authorization needed
-        $query = Category::query();
-
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $categories = Category::where('name', 'like', '%' . $request->search . '%')->get();
+        } else {
+            $categories = Cache::remember('all_categories', now()->addHours(24), function () {
+                return Category::all();
+            });
         }
-
-        $categories = $query->get();
 
         return view('categories.index', [
             'categories' => $categories,
@@ -44,6 +45,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        Cache::forget('all_categories');
         $this->authorize('create', Category::class);
         $validated = $request->validate(['name' => 'required|string|max:255']);
         $validated['slug'] = Str::slug($validated['name']);
@@ -75,6 +77,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        Cache::forget('all_categories');
         $category = Category::findOrFail($id);
         $this->authorize('update', $category);
         $validated = $request->validate(['name' => 'required|string|max:255']);
@@ -87,6 +90,7 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
+        Cache::forget('all_categories');
         $category = Category::findOrFail($id);
         $this->authorize('delete', $category);
         $category->delete();

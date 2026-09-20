@@ -5,6 +5,12 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Stripe\StripeClient;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Order;
+use App\Observers\ProductObserver;
+use App\Observers\CategoryObserver;
+use App\Observers\OrderObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Product::observe(ProductObserver::class);
+        Category::observe(CategoryObserver::class);
+        Order::observe(OrderObserver::class);
+
         // Admin access gate - for general admin panel
         Gate::define('admin', function ($user) {
             return $user->role === 'admin' || $user->role === 'super_admin';
