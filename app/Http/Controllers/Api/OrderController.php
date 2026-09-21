@@ -47,7 +47,7 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
-        $isAdmin = $user && in_array($user->role, ['admin', 'super_admin']);
+        $isAdmin = $user->hasAnyRole(['admin', 'super_admin']);
 
         $query = Order::latest();
 
@@ -91,7 +91,7 @@ class OrderController extends Controller
     public function show(Request $request, Order $order): JsonResponse
     {
         $user = $request->user();
-        $isAdmin = $user && in_array($user->role, ['admin', 'super_admin']);
+        $isAdmin = $user->hasAnyRole(['admin', 'super_admin']);
 
         if ($order->user_id !== $user->id && !$isAdmin) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -197,30 +197,41 @@ class OrderController extends Controller
     public function update(Request $request, Order $order): JsonResponse
     {
         $user = $request->user();
-        $isAdmin = $user && in_array($user->role, ['admin', 'super_admin']);
 
         $validated = $request->validate([
-            'status' => 'required|string|in:pending,processing,completed,cancelled',
+            'status' => 'required|string|in:pending,paid,shipped,completed,cancelled',
         ]);
 
-        if (!$isAdmin) {
-            if ($order->user_id !== $user->id) {
-                return response()->json(['message' => 'Unauthorized'], 403);
-            }
+        $newStatus = $validated['status'];
+        $isOwner = $order->user_id === $user->id;
 
-            // Regular customers can only cancel pending orders
-            if ($validated['status'] !== 'cancelled' || $order->status !== 'pending') {
-                return response()->json([
-                    'message' => 'You can only cancel pending orders.',
-                ], 403);
-            }
+        // Customer cancelling their own order — only allowed while still pending
+        if ($newStatus === 'cancelled' && $isOwner && $order->status === 'pending') {
+            $order->update(['status' => 'cancelled']);
+            return response()->json(['message' => 'Order cancelled', 'data' => $order], 200);
         }
 
-        $order->update(['status' => $validated['status']]);
+        // Admin cancelling any order, any time
+        if ($newStatus === 'cancelled' && $user->can('orders.cancel-any')) {
+            $order->update(['status' => 'cancelled']);
+            return response()->json(['message' => 'Order cancelled', 'data' => $order], 200);
+        }
 
-        return response()->json([
-            'message' => 'Order updated successfully',
-            'data' => $order->load('items.product'),
-        ], 200);
+        // Admin marking an order as shipped — must currently be paid
+        if ($newStatus === 'shipped' && $user->can('orders.mark-shipped')) {
+            if ($order->status !== 'paid') {
+                return response()->json(['message' => 'Order must be paid before it can be shipped.'], 422);
+            }
+            $order->update(['status' => 'shipped']);
+            return response()->json(['message' => 'Order marked as shipped', 'data' => $order], 200);
+        }
+
+        // Customer confirming receipt — must be theirs, and currently shipped
+        if ($newStatus === 'completed' && $isOwner && $order->status === 'shipped') {
+            $order->update(['status' => 'completed']);
+            return response()->json(['message' => 'Order marked as completed', 'data' => $order], 200);
+        }
+
+        return response()->json(['message' => 'This status transition is not allowed.'], 403);
     }
 }

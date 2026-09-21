@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Stripe\StripeClient;
 use Stripe\Exception\ApiErrorException;
 use OpenApi\Attributes as OA;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -174,6 +176,23 @@ class PaymentController extends Controller
                 ],
             ]);
 
+            // Map Stripe's status vocabulary onto your fixed enum
+            $paymentStatus = $intent->status === 'succeeded' ? 'completed' : 'failed';
+
+            \DB::transaction(function () use ($order, $intent, $validated, $paymentStatus) {
+                \App\Models\Payment::create([
+                    'order_id'       => $order->id,
+                    'amount'         => $order->total,
+                    'payment_method' => $validated['payment_method'],
+                    'status'         => $paymentStatus,
+                    'transaction_id' => $intent->id,
+                ]);
+
+                if ($paymentStatus === 'completed') {
+                    $order->update(['status' => 'paid']);
+                }
+            });
+
             return response()->json([
                 'success' => true,
                 'status'  => $intent->status,
@@ -187,4 +206,20 @@ class PaymentController extends Controller
             ], 422);
         }
     }
+
+/**
+ * TODO: Build a Stripe webhook handler (e.g. POST /api/webhooks/stripe) to
+ * complete this flow. createPaymentIntent() only creates a 'pending' Payment
+ * row - it never finds out if the payment actually succeeded, because
+ * confirmation happens client-side via Stripe.js, outside this request.
+ *
+ * The webhook needs to:
+ *  - Be a PUBLIC route (no auth:sanctum) - Stripe calls it directly, not a logged-in user
+ *  - Verify the Stripe-Signature header against your webhook signing secret,
+ *    to confirm the request genuinely came from Stripe and not a forged call
+ *  - Listen for 'payment_intent.succeeded' and 'payment_intent.payment_failed' events
+ *  - Look up the Payment row by transaction_id (Stripe's PaymentIntent id)
+ *  - Update Payment.status to 'completed'/'failed', and on success, set
+ *    Order.status to 'paid' - mirroring what charge() already does inline
+ */
 }

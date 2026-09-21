@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AdminController;
 
 // All routes here are prefixed with the 'api.' route name (e.g. api.login, api.cart.index)
 Route::name('api.')->group(function () {
@@ -74,7 +75,14 @@ Route::name('api.')->group(function () {
         // Two-step Stripe-style flow: create a payment intent first, then charge it
         Route::post('/payments/intent', [PaymentController::class, 'createPaymentIntent']);
         Route::post('/payments/charge', [PaymentController::class, 'charge']);
-    });
+
+        // --- Admin management (super_admin only) ---
+        Route::post('admins', [AdminController::class, 'store'])
+            ->middleware('permission:admins.create')->name('admins.store');
+
+        Route::delete('admins/{admin}', [AdminController::class, 'destroy'])
+            ->middleware('permission:admins.delete')->name('admins.destroy');
+    }); // <- closes auth:sanctum group
 });
 
 // Simple endpoint to fetch the currently authenticated user from their token

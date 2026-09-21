@@ -16,6 +16,113 @@
         }
     ],
     "paths": {
+        "/api/admins": {
+            "post": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Create a new admin account",
+                "description": "Creates a user and assigns the 'admin' role. Requires the 'admins.create' permission (super_admin only).",
+                "operationId": "f71f35653527de862c3385b6c330fa70",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Jane Admin"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jane@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Admin account created successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - missing 'admins.create' permission"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admins/{admin}": {
+            "delete": {
+                "tags": [
+                    "Admins"
+                ],
+                "summary": "Delete an admin account",
+                "description": "Requires the 'admins.delete' permission (super_admin only). Cannot be used to delete a super_admin account.",
+                "operationId": "35b0b49bd62f97d43c2acdd27ba4d1f2",
+                "parameters": [
+                    {
+                        "name": "admin",
+                        "in": "path",
+                        "description": "ID of the admin user to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Admin account deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden - missing permission, or target is a super_admin"
+                    },
+                    "404": {
+                        "description": "User is not an admin"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/register": {
             "post": {
                 "tags": [
@@ -1266,6 +1373,10 @@
         }
     },
     "tags": [
+        {
+            "name": "Admins",
+            "description": "Admins"
+        },
         {
             "name": "Auth",
             "description": "Auth"
