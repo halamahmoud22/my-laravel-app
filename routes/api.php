@@ -83,8 +83,9 @@ Route::name('api.')->group(function () {
         Route::delete('admins/{admin}', [AdminController::class, 'destroy'])
             ->middleware('permission:admins.delete')->name('admins.destroy');
     }); // <- closes auth:sanctum group
+    // route for Stripe webhook to handle payment events (public, no auth)
+    Route::post('/webhooks/stripe', [PaymentController::class, 'webhook']);
 });
-
 // Simple endpoint to fetch the currently authenticated user from their token
 Route::get('/user', function (Request $request) {
     return $request->user();

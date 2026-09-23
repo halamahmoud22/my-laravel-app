@@ -13,10 +13,14 @@ class ProductObserver
     protected function clearCache(Product $product): void
     {
         Cache::forget("product_{$product->id}");
+        Cache::forget("api_product_{$product->id}");
         Cache::forget('dashboard_product_count');
 
         for ($i = 1; $i <= 5; $i++) {
             Cache::forget("home_products_page_{$i}");
+        }
+        for ($i = 1; $i <= 10; $i++) {
+            Cache::forget("api_products_page_{$i}");
         }
         Cache::forget('home_latest_products');
     }

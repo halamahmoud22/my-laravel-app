@@ -13,7 +13,7 @@
         <div class="col-sm-6 col-xl-4 col-xxl-3">
             <div class="card card-flush h-100">
                 <a href="{{ route('products.show', $product) }}" class="d-block bg-light rounded-top overflow-hidden">
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                    <img src="{{ optional($product)->image_url }}" alt="{{ $product->name }}"
                         class="w-100 object-fit-cover" style="height: 220px;"
                         onerror="this.src='{{ asset('assets/media/products/1.png') }}'" />
                 </a>
@@ -60,3 +60,4 @@
     <div class="d-flex justify-content-center mt-10">{{ $products->onEachSide(1)->links('pagination::bootstrap-5') }}
     </div>
 @endif
+stripe payment_intents confirm pi_3UISkgRpE7KpJGfy15dwdH13 --payment-method pm_card_visa

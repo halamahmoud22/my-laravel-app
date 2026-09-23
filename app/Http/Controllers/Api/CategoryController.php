@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
@@ -35,12 +36,22 @@ class CategoryController extends Controller
     )]
     public function index(Request $request): JsonResponse
     {
-        $query = Category::withCount('products');
+        if (!$request->filled('search')) {
+            if ($request->boolean('all')) {
+                $categories = Cache::remember('api_all_categories', now()->addHours(24), function () {
+                    return Category::withCount('products')->get();
+                });
+                return response()->json($categories);
+            }
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $page = $request->get('page', 1);
+            $categories = Cache::remember("api_categories_page_{$page}", now()->addHours(12), function () {
+                return Category::withCount('products')->paginate(10);
+            });
+            return response()->json($categories);
         }
 
+        $query = Category::withCount('products')->where('name', 'like', '%' . $request->search . '%');
         $categories = $request->boolean('all') ? $query->get() : $query->paginate(10);
         return response()->json($categories);
     }
@@ -64,7 +75,11 @@ class CategoryController extends Controller
     )]
     public function show(Category $category): JsonResponse
     {
-        return response()->json($category->load('products'));
+        $categoryData = Cache::remember("api_category_{$category->id}", now()->addHours(6), function () use ($category) {
+            return $category->load('products');
+        });
+
+        return response()->json($categoryData);
     }
 
     #[OA\Post(

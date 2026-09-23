@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
 
 class ProductsController extends Controller
@@ -26,9 +27,13 @@ class ProductsController extends Controller
             new OA\Response(response: 200, description: "A paginated list of products"),
         ]
     )]
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::with('category')->paginate(10);
+        $page = $request->get('page', 1);
+        $products = Cache::remember("api_products_page_{$page}", now()->addMinutes(15), function () {
+            return Product::with('category')->paginate(10);
+        });
+
         return response()->json($products);
     }
 
@@ -51,7 +56,11 @@ class ProductsController extends Controller
     )]
     public function show(Product $product): JsonResponse
     {
-        return response()->json($product->load('category'));
+        $productData = Cache::remember("api_product_{$product->id}", now()->addHours(6), function () use ($product) {
+            return $product->load('category');
+        });
+
+        return response()->json($productData);
     }
 
     #[OA\Post(

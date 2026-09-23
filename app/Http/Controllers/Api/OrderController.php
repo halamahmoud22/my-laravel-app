@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
+use App\Jobs\SendOrderConfirmation;
 
 class OrderController extends Controller
 {
@@ -113,6 +114,7 @@ class OrderController extends Controller
     )]
     public function store(Request $request): JsonResponse
     {
+    // 1. validate + build the order
         $user = $request->user();
 
         $cartItems = Cart::where('user_id', $user->id)
@@ -135,7 +137,7 @@ class OrderController extends Controller
                 'total' => $total,
                 'status' => 'pending',
             ]);
-
+        // 2. copy cart items -> order_items (snapshot)
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -144,9 +146,10 @@ class OrderController extends Controller
                     'price' => $item->product ? $item->product->price : 0,
                 ]);
             }
-
+        // 3. clear the cart
             Cart::where('user_id', $user->id)->delete();
-
+        // 4. dispatch the background job — NEW
+            SendOrderConfirmation::dispatch($order);
             // Log this order to the
             // 'logs' database connection (separate DB from orders/carts)
             ActivityLog::create([

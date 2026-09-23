@@ -1047,40 +1047,31 @@
                 ]
             }
         },
-        "/api/payments/charge": {
+        "/api/webhooks/stripe": {
             "post": {
                 "tags": [
                     "Payments"
                 ],
-                "summary": "Create and immediately confirm a Stripe charge",
-                "description": "Creates a PaymentIntent and confirms it in the same request using an existing payment_method (no client-side confirmation step needed).",
-                "operationId": "40873519bd7e0c0a8ae70f19a3b42a78",
+                "summary": "Handle incoming Stripe webhook events",
+                "description": "Public endpoint called directly by Stripe (not by app users) to confirm the real outcome of a payment. Verifies the Stripe-Signature header against the webhook signing secret, then updates the matching Payment and Order records based on the event type (payment_intent.succeeded / payment_intent.payment_failed).",
+                "operationId": "f9fe5e7a62ce13868d03dbdb6ebc8343",
                 "requestBody": {
+                    "description": "Raw Stripe Event payload, signed via the Stripe-Signature header.",
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
-                                "required": [
-                                    "order_id",
-                                    "currency",
-                                    "payment_method"
-                                ],
                                 "properties": {
-                                    "order_id": {
-                                        "description": "ID of the order to charge",
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "currency": {
+                                    "id": {
                                         "type": "string",
-                                        "example": "usd",
-                                        "maxLength": 3,
-                                        "minLength": 3
+                                        "example": "evt_1P..."
                                     },
-                                    "payment_method": {
-                                        "description": "Stripe PaymentMethod ID",
+                                    "type": {
                                         "type": "string",
-                                        "example": "pm_card_visa"
+                                        "example": "payment_intent.succeeded"
+                                    },
+                                    "data": {
+                                        "type": "object"
                                     }
                                 },
                                 "type": "object"
@@ -1090,22 +1081,14 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Charge created and confirmed",
+                        "description": "Event received and processed (or ignored if not a handled type)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
+                                        "received": {
                                             "type": "boolean",
                                             "example": true
-                                        },
-                                        "status": {
-                                            "type": "string",
-                                            "example": "succeeded"
-                                        },
-                                        "id": {
-                                            "type": "string",
-                                            "example": "pi_3P..."
                                         }
                                     },
                                     "type": "object"
@@ -1113,36 +1096,13 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Validation error or Stripe API error (e.g. card declined)",
+                    "400": {
+                        "description": "Invalid payload or signature verification failed",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "order not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
+                                        "error": {
                                             "type": "string"
                                         }
                                     },
@@ -1151,12 +1111,7 @@
                             }
                         }
                     }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                }
             }
         },
         "/api/products": {

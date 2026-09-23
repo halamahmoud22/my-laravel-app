@@ -11,6 +11,7 @@ use Stripe\Exception\ApiErrorException;
 use OpenApi\Attributes as OA;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\LogPaymentActivity;
 
 class PaymentController extends Controller
 {
@@ -77,19 +78,42 @@ class PaymentController extends Controller
             'order_id' => 'required|exists:orders,id',
             'currency' => 'required|string|size:3',
         ]);
+
         $order = Order::findOrFail($validated['order_id']);
+        $this->authorize('view', $order);
+
+        if ($order->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This order cannot be paid again.',
+            ], 422);
+        }
+
         $amountInCents = (int) round($order->total * 100);
+
         try {
             $intent = $this->stripe->paymentIntents->create([
                 'amount'   => $amountInCents,
                 'currency' => $validated['currency'],
-                'automatic_payment_methods' => ['enabled' => true],
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                    'allow_redirects' => 'never',
+                ],
+                'metadata' => ['order_id' => $order->id],
+            ]);
+
+            Payment::create([
+                'order_id'       => $order->id,
+                'amount'         => $order->total,
+                'payment_method' => 'card',
+                'status'         => 'pending',
+                'transaction_id' => $intent->id,
             ]);
 
             return response()->json([
-                'success'      => true,
+                'success'       => true,
                 'client_secret' => $intent->client_secret,
-                'id'           => $intent->id,
+                'id'            => $intent->id,
             ]);
         } catch (ApiErrorException $e) {
             Log::error('Stripe PaymentIntent error', ['error' => $e->getMessage()]);
@@ -99,127 +123,105 @@ class PaymentController extends Controller
             ], 422);
         }
     }
-
     #[OA\Post(
-        path: '/api/payments/charge',
-        summary: 'Create and immediately confirm a Stripe charge',
-        description: 'Creates a PaymentIntent and confirms it in the same request using an existing payment_method (no client-side confirmation step needed).',
+        path: '/api/webhooks/stripe',
+        summary: 'Handle incoming Stripe webhook events',
+        description: 'Public endpoint called directly by Stripe (not by app users) to confirm the real outcome of a payment. Verifies the Stripe-Signature header against the webhook signing secret, then updates the matching Payment and Order records based on the event type (payment_intent.succeeded / payment_intent.payment_failed).',
         tags: ['Payments'],
-        security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
             required: true,
+            description: 'Raw Stripe Event payload, signed via the Stripe-Signature header.',
             content: new OA\JsonContent(
-                required: ['order_id', 'currency', 'payment_method'],
                 properties: [
-                    new OA\Property(property: 'order_id', type: 'integer', example: 1, description: 'ID of the order to charge'),
-                    new OA\Property(property: 'currency', type: 'string', minLength: 3, maxLength: 3, example: 'usd'),
-                    new OA\Property(property: 'payment_method', type: 'string', example: 'pm_card_visa', description: 'Stripe PaymentMethod ID'),
+                    new OA\Property(property: 'id', type: 'string', example: 'evt_1P...'),
+                    new OA\Property(property: 'type', type: 'string', example: 'payment_intent.succeeded'),
+                    new OA\Property(property: 'data', type: 'object'),
                 ]
             )
         ),
         responses: [
             new OA\Response(
                 response: 200,
-                description: 'Charge created and confirmed',
+                description: 'Event received and processed (or ignored if not a handled type)',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: true),
-                        new OA\Property(property: 'status', type: 'string', example: 'succeeded'),
-                        new OA\Property(property: 'id', type: 'string', example: 'pi_3P...'),
+                        new OA\Property(property: 'received', type: 'boolean', example: true),
                     ]
                 )
             ),
             new OA\Response(
-                response: 422,
-                description: 'Validation error or Stripe API error (e.g. card declined)',
+                response: 400,
+                description: 'Invalid payload or signature verification failed',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: false),
-                        new OA\Property(property: 'message', type: 'string'),
-                    ]
-                )
-            ),
-            new OA\Response(
-                response: 404,
-                description: 'order not found',
-                content: new OA\JsonContent(
-                    properties: [
-                        new OA\Property(property: 'success', type: 'boolean', example: false),
-                        new OA\Property(property: 'message', type: 'string'),
+                        new OA\Property(property: 'error', type: 'string'),
                     ]
                 )
             ),
         ]
     )]
-    public function charge(Request $request)
+    public function webhook(Request $request)
     {
-        $validated = $request->validate([
-            'order_id'       => 'required|exists:orders,id',
-            'currency'       => 'required|string|size:3',
-            'payment_method' => 'required|string',
-        ]);
-
-        $order = Order::findOrFail($validated['order_id']);
-        $this->authorize('view', $order);
-
-        $amountInCents = (int) round($order->total * 100);
+        $payload = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature');
+        $endpointSecret = config('services.stripe.webhook_secret');
 
         try {
-            $intent = $this->stripe->paymentIntents->create([
-                'amount'         => $amountInCents,
-                'currency'       => $validated['currency'],
-                'payment_method' => $validated['payment_method'],
-                'confirm'        => true,
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                    'allow_redirects' => 'never',
-                ],
-            ]);
-
-            // Map Stripe's status vocabulary onto your fixed enum
-            $paymentStatus = $intent->status === 'succeeded' ? 'completed' : 'failed';
-
-            \DB::transaction(function () use ($order, $intent, $validated, $paymentStatus) {
-                \App\Models\Payment::create([
-                    'order_id'       => $order->id,
-                    'amount'         => $order->total,
-                    'payment_method' => $validated['payment_method'],
-                    'status'         => $paymentStatus,
-                    'transaction_id' => $intent->id,
-                ]);
-
-                if ($paymentStatus === 'completed') {
-                    $order->update(['status' => 'paid']);
-                }
-            });
-
-            return response()->json([
-                'success' => true,
-                'status'  => $intent->status,
-                'id'      => $intent->id,
-            ]);
-        } catch (ApiErrorException $e) {
-            Log::error('Stripe charge error', ['error' => $e->getMessage()]);
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
+            $event = \Stripe\Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+        } catch (\UnexpectedValueException $e) {
+            Log::error('Stripe webhook: invalid payload');
+            return response()->json(['error' => 'Invalid payload'], 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            Log::error('Stripe webhook: invalid signature');
+            return response()->json(['error' => 'Invalid signature'], 400);
         }
+
+        $intent = $event->data->object;
+
+        switch ($event->type) {
+            case 'payment_intent.succeeded':
+                $this->markPaymentCompleted($intent);
+                break;
+
+            case 'payment_intent.payment_failed':
+                $this->markPaymentFailed($intent);
+                break;
+        }
+
+        return response()->json(['received' => true]);
     }
 
-/**
- * TODO: Build a Stripe webhook handler (e.g. POST /api/webhooks/stripe) to
- * complete this flow. createPaymentIntent() only creates a 'pending' Payment
- * row - it never finds out if the payment actually succeeded, because
- * confirmation happens client-side via Stripe.js, outside this request.
- *
- * The webhook needs to:
- *  - Be a PUBLIC route (no auth:sanctum) - Stripe calls it directly, not a logged-in user
- *  - Verify the Stripe-Signature header against your webhook signing secret,
- *    to confirm the request genuinely came from Stripe and not a forged call
- *  - Listen for 'payment_intent.succeeded' and 'payment_intent.payment_failed' events
- *  - Look up the Payment row by transaction_id (Stripe's PaymentIntent id)
- *  - Update Payment.status to 'completed'/'failed', and on success, set
- *    Order.status to 'paid' - mirroring what charge() already does inline
- */
+    protected function markPaymentCompleted($intent)
+    {
+        DB::transaction(function () use ($intent) {
+            $payment = Payment::where('transaction_id', $intent->id)->first();
+
+            if (! $payment || $payment->status === 'completed') {
+                return; // not found, or already processed - avoid double-updating
+            }
+            $payment->update(['status' => 'completed']);
+            $payment->order->update(['status' => 'paid']);
+
+            LogPaymentActivity::dispatch(
+                userId: $payment->order->user_id,
+                action: 'payment_confirmed',
+                description: "Payment {$payment->transaction_id} confirmed via webhook for Order #{$payment->order_id}"
+            );
+        });
+    }
+
+    protected function markPaymentFailed($intent)
+    {
+        $payment = Payment::where('transaction_id', $intent->id)->first();
+
+        if ($payment && $payment->status !== 'completed') {
+            $payment->update(['status' => 'failed']);
+
+            LogPaymentActivity::dispatch(
+                userId: $payment->order->user_id,
+                action: 'payment_failed',
+                description: "Payment {$payment->transaction_id} failed via webhook for Order #{$payment->order_id}"
+            );
+        }
+    }
 }
