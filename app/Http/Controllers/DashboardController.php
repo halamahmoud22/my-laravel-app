@@ -29,12 +29,10 @@ $orderCount = Cache::remember('dashboard_order_count', now()->addMinutes(10), fu
     return Order::count();
 });
 
-        $recentOrders = Cache::remember('dashboard_recent_orders', now()->addMinutes(5), function () {
-            return Order::with('user')
-                ->latest()
-                ->take(5)
-                ->get();
-        });
+        $recentOrders = Order::with('user')
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('dashboard', compact(
             'productCount',

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductsController;
 use Illuminate\Http\Request;
@@ -9,6 +10,12 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AdminController;
+
+use Illuminate\Support\Facades\Broadcast;
+
+// Register the broadcast auth endpoint for API (Sanctum) clients
+// This creates a POST /api/broadcasting/auth route
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 // All routes here are prefixed with the 'api.' route name (e.g. api.login, api.cart.index)
 Route::name('api.')->group(function () {
@@ -60,7 +67,6 @@ Route::name('api.')->group(function () {
         // middleware needed here - ownership is enforced inside the controller
         Route::get('cart', [CartController::class, 'index'])->name('cart.index');
         Route::post('cart', [CartController::class, 'store'])->name('cart.store');
-        Route::post('cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
         Route::put('cart/{cart}', [CartController::class, 'update'])->name('cart.update');
         Route::patch('cart/{cart}', [CartController::class, 'update']); // same handler as PUT
         Route::delete('cart/{cart}', [CartController::class, 'destroy'])->name('cart.destroy');
@@ -75,6 +81,13 @@ Route::name('api.')->group(function () {
         // Two-step Stripe-style flow: create a payment intent first, then charge it
         Route::post('/payments/intent', [PaymentController::class, 'createPaymentIntent']);
         Route::post('/payments/charge', [PaymentController::class, 'charge']);
+
+        // --- Notifications endpoints ---
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 
         // --- Admin management (super_admin only) ---
         Route::post('admins', [AdminController::class, 'store'])

@@ -7,10 +7,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
 use App\Models\ActivityLog;
-use App\Jobs\SendOrderConfirmation;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Jobs\UpdateProductStock;
+use App\Events\OrderPlaced;
 
 class OrderController extends Controller
 {
@@ -124,9 +123,8 @@ class OrderController extends Controller
             ]);
         }
         Cart::where('user_id', auth()->id())->delete();
-        // 4. dispatch the background job
-        SendOrderConfirmation::dispatch($order);
-        UpdateProductStock::dispatch($order);
+        // 4. dispatch event — NEW
+        event(new OrderPlaced($order));
         ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'order_placed',

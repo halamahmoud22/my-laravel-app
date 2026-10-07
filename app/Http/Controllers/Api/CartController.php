@@ -93,59 +93,7 @@ class CartController extends Controller
         ], 201);
     }
 
-    #[OA\Post(
-        path: "/api/cart/add/{product}",
-        summary: "Add product to cart by product ID parameter",
-        tags: ["Cart"],
-        security: [["bearerAuth" => []]],
-        parameters: [
-            new OA\Parameter(
-                name: "product",
-                in: "path",
-                required: true,
-                schema: new OA\Schema(type: "integer", example: 1)
-            ),
-            new OA\Parameter(
-                name: "quantity",
-                in: "query",
-                schema: new OA\Schema(type: "integer", example: 1)
-            ),
-        ],
-        responses: [
-            new OA\Response(response: 200, description: "Product added to cart successfully"),
-            new OA\Response(response: 401, description: "Unauthenticated"),
-            new OA\Response(response: 404, description: "Product not found"),
-        ]
-    )]
-    public function add(Request $request, Product $product): JsonResponse
-    {
-        $quantity = (int) $request->input('quantity', 1);
-        if ($quantity < 1) {
-            $quantity = 1;
-        }
 
-        $userId = $request->user()->id;
-
-        $cart = Cart::where('user_id', $userId)
-            ->where('product_id', $product->id)
-            ->first();
-
-        if ($cart) {
-            $cart->increment('quantity', $quantity);
-            $cart->refresh();
-        } else {
-            $cart = Cart::create([
-                'user_id' => $userId,
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Product added to cart successfully',
-            'data' => $cart->load('product'),
-        ], 200);
-    }
 
     #[OA\Put(
         path: "/api/cart/{id}",

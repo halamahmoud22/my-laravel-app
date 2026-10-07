@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
-use App\Models\ActivityLog;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
-use App\Jobs\SendOrderConfirmation;
-
+use App\Events\OrderPlaced;
 class OrderController extends Controller
 {
     #[OA\Get(
@@ -114,7 +112,7 @@ class OrderController extends Controller
     )]
     public function store(Request $request): JsonResponse
     {
-    // 1. validate + build the order
+        // 1. validate + build the order
         $user = $request->user();
 
         $cartItems = Cart::where('user_id', $user->id)
@@ -137,7 +135,7 @@ class OrderController extends Controller
                 'total' => $total,
                 'status' => 'pending',
             ]);
-        // 2. copy cart items -> order_items (snapshot)
+            // 2. copy cart items -> order_items (snapshot)
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -146,18 +144,10 @@ class OrderController extends Controller
                     'price' => $item->product ? $item->product->price : 0,
                 ]);
             }
-        // 3. clear the cart
+            // 3. clear the cart
             Cart::where('user_id', $user->id)->delete();
-        // 4. dispatch the background job — NEW
-            SendOrderConfirmation::dispatch($order);
-            // Log this order to the
-            // 'logs' database connection (separate DB from orders/carts)
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'order_placed',
-                'description' => "Order #{$order->id} placed",
-            ]);
-
+            // 4. dispatch event — NEW
+            event(new OrderPlaced($order));
             return $order;
         });
 
